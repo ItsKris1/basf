@@ -12,12 +12,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var userInfo User
-
 type User struct {
-	email    string
-	username string
+	Email    string
+	Username string
 	password string
+	Err      string
 }
 
 func HashPassword(password string) (string, error) {
@@ -35,7 +34,7 @@ func addUser(db *sql.DB, stru User) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	stmt.Exec(stru.username, stru.password, stru.email)
+	stmt.Exec(stru.Username, stru.password, stru.Email)
 	defer stmt.Close()
 }
 
@@ -57,6 +56,8 @@ func rowExists(db *sql.DB, column string, value string) bool {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
+	var userInfo User
+
 	if r.Method == "POST" {
 		if err := r.ParseForm(); err != nil {
 			fmt.Println(err)
@@ -80,8 +81,8 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		// Checking user entered username and email
 		switch {
 		case !unExists && !emailExists:
-			userInfo.username = r.FormValue("username")
-			userInfo.email = r.FormValue("email")
+			userInfo.Username = r.FormValue("username")
+			userInfo.Email = r.FormValue("email")
 
 			encryptedPswd, err := HashPassword(r.FormValue("password"))
 			if err != nil {
@@ -93,13 +94,13 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			addUser(db, userInfo)
 
 		case unExists && emailExists:
-			fmt.Println("Email and username exists")
+			userInfo.Err = "Email and username exists"
 
 		case unExists:
-			fmt.Println("Username exists")
+			userInfo.Err = "Username exists"
 
 		case emailExists:
-			fmt.Print("Email exists")
+			userInfo.Err = "Email exists"
 		}
 
 	}
@@ -111,7 +112,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, userInfo)
 	if err != nil {
 		http.Error(w, "500 Internal Server error", 500)
 		fmt.Println(err)
