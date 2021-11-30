@@ -13,10 +13,14 @@ import (
 )
 
 type User struct {
-	Email    string
-	Username string
-	password string
-	Err      string
+	Email        string
+	Username     string
+	password     string
+	Registration struct {
+		TakenUn     bool // taken username
+		TakenEmail  bool // taken email
+		PswrdsNotEq bool // user typed passwords match
+	}
 }
 
 func HashPassword(password string) (string, error) {
@@ -55,6 +59,9 @@ func rowExists(db *sql.DB, column string, value string) bool {
 	}
 }
 
+func pwrdsSame(pwd1, pwd2 string) bool {
+	return pwd1 == pwd2
+}
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	var userInfo User
 
@@ -74,13 +81,13 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 		defer db.Close()
 
-		// un - username
-		unExists := rowExists(db, "username", r.FormValue("username"))
+		unExists := rowExists(db, "username", r.FormValue("username")) // un - username
 		emailExists := rowExists(db, "email", r.FormValue("email"))
+		pwrdsMatch := pwrdsSame(r.FormValue("password"), r.FormValue("password2"))
 
 		// Checking user entered username and email
-		switch {
-		case !unExists && !emailExists:
+		if !unExists && !emailExists && pwrdsMatch {
+
 			userInfo.Username = r.FormValue("username")
 			userInfo.Email = r.FormValue("email")
 
@@ -92,15 +99,17 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Adds entered data to db
 			addUser(db, userInfo)
+		}
 
-		case unExists && emailExists:
-			userInfo.Err = "Email and username exists"
+		if !pwrdsMatch {
+			userInfo.Registration.PswrdsNotEq = true
+		}
+		if unExists {
+			userInfo.Registration.TakenUn = true
+		}
 
-		case unExists:
-			userInfo.Err = "Username exists"
-
-		case emailExists:
-			userInfo.Err = "Email exists"
+		if emailExists {
+			userInfo.Registration.TakenEmail = true
 		}
 
 	}

@@ -11,27 +11,44 @@
             margin-bottom: 1rem;
         }
 
-
+        .error {
+            display: inline-block;
+            margin: 0;
+        }
 
     </style>
 </head>
 <body>
-    {{ .Err }}
-    <h2>Register</h2>
+    
+    <h2>Create an account</h2>
     
     <form action="/" method="post">
         <div class="form-control">
             Email: <input type="email" name="email" id="email" required>
-        
+            {{ if .Registration.TakenEmail}}
+            <p class="error">Email already exists!</p>
+            {{ end}}
+
         </div>
         
 
         <div class="form-control">
-            Username: <input type="text" name="username" id="username" required> 
+            Username: <input type="text" name="username" id="username" required>
+            {{ if .Registration.TakenUn}}
+            <p class="error">Username already exists!</p>
+            {{ end}}
         </div>
         
         <div class="form-control">
             Password: <input type="password" name="password" id="password" required>
+            {{ if .Registration.PswrdsNotEq}}
+            <p class="error">Passwords dont match!</p>
+            
+            {{ end}}
+        </div>
+
+        <div class="form-control">
+            Retype password: <input type="password" name="password2" id="password2" required>
         </div>
         
         
