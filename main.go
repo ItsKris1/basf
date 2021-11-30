@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"golang.org/x/crypto/bcrypt"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -24,39 +26,61 @@ func checkErr(err error) {
 	}
 }
 
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func addData(db *sql.DB, stru User) {
+	stmt, err := db.Prepare("INSERT INTO user (username, password, email) VALUES (?, ?, ?)")
+	checkErr(err)
+	stmt.Exec(stru.username, stru.password, stru.email)
+	defer stmt.Close()
+}
+
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 
-		userInfo = User{
-			email:    r.FormValue("email"),
-			username: r.FormValue("username"),
-			password: r.FormValue("password"),
-		}
+		// Encrypts the password
+		encryptedPswd, err := HashPassword(r.FormValue("password"))
+		checkErr(err)
 
+		// Check entered email
 		db, err := sql.Open("sqlite3", "./db/names.db")
 		checkErr(err)
 
 		defer db.Close()
 
-		stmt, err := db.Prepare("INSERT INTO user (username, password, email) VALUES (?, ?, ?)")
-		checkErr(err)
+		// Passes data to struct
+		userInfo = User{
+			email:    r.FormValue("email"),
+			username: r.FormValue("username"),
+			password: encryptedPswd,
+		}
+		//"SELECT email FROM user WHERE email = ?"
 
-		fmt.Println("Userinfo", userInfo)
-		stmt.Exec(userInfo.username, userInfo.password, userInfo.email)
-		defer stmt.Close()
+		// Adds entered data to db
+		addData(db, userInfo)
 	}
 
 	tmpl, err := template.ParseFiles("./templates/register.html")
 	if err != nil {
 		http.Error(w, "Error occured during parsing template", 500)
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 
 	tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Error occured during the execution of template", 500)
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 }
 
