@@ -107,7 +107,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		if unExists {
 			userInfo.Registration.TakenUn = true
 		}
-
 		if emailExists {
 			userInfo.Registration.TakenEmail = true
 		}
