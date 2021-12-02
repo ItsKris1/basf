@@ -25,7 +25,7 @@
     <form action="/" method="post">
         <div class="form-control">
             Email: <input type="email" name="email" id="email" required>
-            {{ if .Registration.TakenEmail}}
+            {{ if .TakenEmail}}
             <p class="error">Email already exists!</p>
             {{ end}}
 
@@ -34,14 +34,14 @@
 
         <div class="form-control">
             Username: <input type="text" name="username" id="username" required>
-            {{ if .Registration.TakenUn}}
+            {{ if .TakenUn}}
             <p class="error">Username already exists!</p>
             {{ end}}
         </div>
         
         <div class="form-control">
             Password: <input type="password" name="password" id="password" required>
-            {{ if .Registration.PswrdsNotEq}}
+            {{ if .PswrdsNotEq}}
             <p class="error">Passwords dont match!</p>
             
             {{ end}}

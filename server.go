@@ -13,76 +13,52 @@ import (
 )
 
 type User struct {
-	Email        string
-	Username     string
-	password     string
-	Registration struct {
-		TakenUn     bool // taken username
-		TakenEmail  bool // taken email
-		PswrdsNotEq bool // user typed passwords match
-	}
+	Email    string
+	Username string
+	password string
 }
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
+type Validation struct {
+	TakenUn     bool // taken username
+	TakenEmail  bool // taken email
+	PswrdsNotEq bool // user typed passwords matc
 }
 
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
+var db *sql.DB
+var tpl *template.Template
 
-func addUser(db *sql.DB, stru User) {
-	stmt, err := db.Prepare("INSERT INTO user (username, password, email) VALUES (?, ?, ?)")
+func main() {
+	var err error
+	db, err = sql.Open("sqlite3", "./db/names.db")
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	stmt.Exec(stru.Username, stru.password, stru.Email)
-	defer stmt.Close()
-}
 
-func rowExists(db *sql.DB, column string, value string) bool {
-	stmt := fmt.Sprintf(`SELECT %v FROM user WHERE %v = ?`, column, column)
-	row := db.QueryRow(stmt, value)
+	tpl = template.Must(template.ParseGlob("./templates/*.html"))
 
-	switch err := row.Scan(&value); err {
+	http.HandleFunc("/", registerHandler)
 
-	case sql.ErrNoRows:
-		return false
-
-	case nil:
-		return true
-
-	default: // If error is not nil and not sql.ErrNoRows
-		return false
+	if err := http.ListenAndServe(":8000", nil); err != nil {
+		log.Fatal(err)
 	}
+
 }
 
-func pwrdsSame(pwd1, pwd2 string) bool {
-	return pwd1 == pwd2
-}
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	var userInfo User
+	var validation Validation
 
 	if r.Method == "POST" {
 		if err := r.ParseForm(); err != nil {
 			fmt.Println(err)
+
 			http.Error(w, "Bad request!", 400)
 			return
 		}
 
-		db, err := sql.Open("sqlite3", "./db/names.db")
-		if err != nil {
-			http.Error(w, "500 Internal Server Error", 500)
-			fmt.Println(err)
-			return
-		}
-
-		defer db.Close()
-
-		unExists := rowExists(db, "username", r.FormValue("username")) // un - username
-		emailExists := rowExists(db, "email", r.FormValue("email"))
+		unExists := rowExists("username", r.FormValue("username")) // un - username
+		emailExists := rowExists("email", r.FormValue("email"))
 		pwrdsMatch := pwrdsSame(r.FormValue("password"), r.FormValue("password2"))
 
 		// Checking user entered username and email
@@ -98,41 +74,67 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			userInfo.password = encryptedPswd
 
 			// Adds entered data to db
-			addUser(db, userInfo)
+			addUser(userInfo)
 		}
 
 		if !pwrdsMatch {
-			userInfo.Registration.PswrdsNotEq = true
+			validation.PswrdsNotEq = true
 		}
 		if unExists {
-			userInfo.Registration.TakenUn = true
+			validation.TakenUn = true
 		}
 		if emailExists {
-			userInfo.Registration.TakenEmail = true
+			validation.TakenEmail = true
 		}
 
 	}
 
-	tmpl, err := template.ParseFiles("./templates/register.html")
+	err := tpl.ExecuteTemplate(w, "register.htmls", validation)
 	if err != nil {
-		http.Error(w, "500 Internal Server Error", 500)
 		fmt.Println(err)
-		return
-	}
 
-	tmpl.Execute(w, userInfo)
-	if err != nil {
 		http.Error(w, "500 Internal Server error", 500)
-		fmt.Println(err)
 		return
 	}
 }
 
-func main() {
-	http.HandleFunc("/", registerHandler)
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
 
-	if err := http.ListenAndServe(":8000", nil); err != nil {
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+func pwrdsSame(pwd1, pwd2 string) bool {
+	return pwd1 == pwd2
+}
+
+func addUser(stru User) {
+	stmt, err := db.Prepare("INSERT INTO user (username, password, email) VALUES (?, ?, ?)")
+	if err != nil {
 		log.Fatal(err)
 	}
+	stmt.Exec(stru.Username, stru.password, stru.Email)
+	defer stmt.Close()
+}
 
+func rowExists(field string, value string) bool {
+
+	stmt := fmt.Sprintf(`SELECT %v FROM user WHERE %v = ?`, field, field)
+	row := db.QueryRow(stmt, value)
+
+	switch err := row.Scan(&value); err {
+
+	case sql.ErrNoRows:
+		return false
+
+	case nil:
+		return true
+
+	default: // If error is not nil and not sql.ErrNoRows
+		log.Println(err)
+		return false
+	}
 }
