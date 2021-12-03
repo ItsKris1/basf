@@ -1,6 +1,7 @@
 package main
 
 import (
+	"forum/internal/handlers"
 	"log"
 	"net/http"
 
@@ -8,7 +9,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", registerHandler)
+	http.HandleFunc("/", handlers.Register)
 
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal(err)

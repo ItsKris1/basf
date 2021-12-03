@@ -60,7 +60,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	tpl, _ := template.ParseFiles("../templates/register.html")
+	tpl, _ := template.ParseFiles("./templates/register.html")
 	err := tpl.Execute(w, validation)
 	if err != nil {
 		fmt.Println(err)
