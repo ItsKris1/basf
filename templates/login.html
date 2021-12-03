@@ -21,15 +21,26 @@
 
 <body>
     <h2>Login</h2>
-    {{ if .Succesful}}
+    {{ if .SuccesfulRegister}}
     <h3>Registration was succesful!</h3>
-    {{ end}}
+    {{ end }}
+
     <form action="/loginauth" method="get">
+        {{ if .NotFound }}
+        <div class="error_msg">
+            <p>User doesnt exist</p>
+        </div>
+        {{ end}}
         <div class="form-control">
             Username: <input type="text" name="username" id="username">
         </div>
         <div class="form-control">
             Password: <input type="password" name="password" id="password">
+            {{ if .WrongPassword}}
+            <div class="error_msg">
+                <p>Wrong passwords</p>
+            </div>
+            {{ end }}
         </div>
 
         <button type="submit">Login</button>

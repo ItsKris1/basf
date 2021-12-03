@@ -8,15 +8,6 @@ import (
 	"net/http"
 )
 
-type Validation struct {
-	TakenUn     bool // taken username
-	TakenEmail  bool // taken email
-	PswrdsNotEq bool // user typed passwords match
-	Succesful   bool // tracks whether registration was successful
-}
-
-var RegValidation Validation
-
 func RegisterAuth(w http.ResponseWriter, r *http.Request) {
 	var db = db.New()
 
@@ -47,19 +38,19 @@ func RegisterAuth(w http.ResponseWriter, r *http.Request) {
 
 			db.AddUser(username, password1, email)
 
-			RegValidation.Succesful = true
+			RegMsgs.Succesful = true
 			http.Redirect(w, r, "/login", 302)
 
 		} else {
 			// Boolean values for displaying errors in registration
 			if !pwrdsMatch {
-				RegValidation.PswrdsNotEq = true
+				RegMsgs.PswrdsNotEq = true
 			}
 			if unExists {
-				RegValidation.TakenUn = true
+				RegMsgs.TakenUn = true
 			}
 			if emailExists {
-				RegValidation.TakenEmail = true
+				RegMsgs.TakenEmail = true
 			}
 			http.Redirect(w, r, "/register", 302)
 		}
