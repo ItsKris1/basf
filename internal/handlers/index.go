@@ -6,10 +6,9 @@ import (
 	"net/http"
 )
 
-func Register(w http.ResponseWriter, r *http.Request) {
-
-	tpl, _ := template.ParseFiles("./templates/register.html")
-	err := tpl.Execute(w, RegValidation)
+func Index(w http.ResponseWriter, r *http.Request) {
+	tpl, _ := template.ParseFiles("./templates/index.html")
+	err := tpl.Execute(w, nil)
 	if err != nil {
 		fmt.Println(err)
 

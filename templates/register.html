@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,7 +8,7 @@
     <title>Forum</title>
 
     <style>
-        .form-control{
+        .form-control {
             margin-bottom: 1rem;
         }
 
@@ -15,14 +16,14 @@
             display: inline-block;
             margin: 0;
         }
-
     </style>
 </head>
+
 <body>
-    
+
     <h2>Create an account</h2>
-    
-    <form action="/" method="post">
+
+    <form action="/registerauth" method="post">
         <div class="form-control">
             Email: <input type="email" name="email" id="email" required>
             {{ if .TakenEmail}}
@@ -30,7 +31,7 @@
             {{ end}}
 
         </div>
-        
+
 
         <div class="form-control">
             Username: <input type="text" name="username" id="username" required>
@@ -38,21 +39,22 @@
             <p class="error">Username already exists!</p>
             {{ end}}
         </div>
-        
+
         <div class="form-control">
             Password: <input type="password" name="password" id="password" required>
             {{ if .PswrdsNotEq}}
             <p class="error">Passwords dont match!</p>
-            
+
             {{ end}}
         </div>
 
         <div class="form-control">
             Retype password: <input type="password" name="password2" id="password2" required>
         </div>
-        
-        
+
+
         <button type="submit">Register</button>
     </form>
 </body>
+
 </html>
