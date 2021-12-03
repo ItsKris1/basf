@@ -32,10 +32,10 @@
         </div>
         {{ end}}
         <div class="form-control">
-            Username: <input type="text" name="username" id="username">
+            Username: <input type="text" name="username" id="username" required>
         </div>
         <div class="form-control">
-            Password: <input type="password" name="password" id="password">
+            Password: <input type="password" name="password" id="password" required>
             {{ if .WrongPassword}}
             <div class="error_msg">
                 <p>Wrong passwords</p>
