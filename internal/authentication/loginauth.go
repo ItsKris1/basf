@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"forum/internal/db"
 	"forum/internal/hash"
+	"forum/internal/sessions"
 	"net/http"
 )
 
@@ -40,6 +41,8 @@ func LoginAuth(w http.ResponseWriter, r *http.Request) {
 	// Match was found
 	case nil:
 		if comparePwrds := hash.CheckPasswordHash(password, passwordHash); comparePwrds { // Compare passwords
+			sessions.GetCookie(w, r, username) // Get or create new cookie for the user
+
 			fmt.Println("Logged in!")
 			http.Redirect(w, r, "/", 302)
 			return
