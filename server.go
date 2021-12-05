@@ -1,6 +1,7 @@
 package main
 
 import (
+	auth "forum/internal/authentication"
 	"forum/internal/handlers"
 	"log"
 	"net/http"
@@ -11,9 +12,9 @@ import (
 func main() {
 	http.HandleFunc("/", handlers.Index)
 	http.HandleFunc("/register", handlers.Register)
-	http.HandleFunc("/registerauth", handlers.RegisterAuth)
+	http.HandleFunc("/registerauth", auth.RegisterAuth)
 	http.HandleFunc("/login", handlers.Login)
-	http.HandleFunc("/loginauth", handlers.LoginAuth)
+	http.HandleFunc("/loginauth", auth.LoginAuth)
 
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal(err)

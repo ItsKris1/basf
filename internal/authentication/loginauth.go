@@ -1,4 +1,4 @@
-package handlers
+package authentication
 
 import (
 	"database/sql"
@@ -7,6 +7,14 @@ import (
 	"forum/internal/hash"
 	"net/http"
 )
+
+type LoginMessages struct {
+	NotFound          bool
+	WrongPassword     bool
+	SuccesfulRegister bool // Gives user feedback on login page after succesful registration
+}
+
+var LoginMsgs LoginMessages
 
 func LoginAuth(w http.ResponseWriter, r *http.Request) {
 	db := db.New()

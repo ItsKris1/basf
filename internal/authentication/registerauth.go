@@ -1,4 +1,4 @@
-package handlers
+package authentication
 
 import (
 	"fmt"
@@ -7,6 +7,15 @@ import (
 	"log"
 	"net/http"
 )
+
+type RegisterMessages struct {
+	TakenUn     bool // taken username
+	TakenEmail  bool // taken email
+	PswrdsNotEq bool // user typed passwords dont match
+	Succesful   bool // tracks whether registration was successful
+}
+
+var RegMsgs RegisterMessages
 
 func RegisterAuth(w http.ResponseWriter, r *http.Request) {
 	var db = db.New()

@@ -2,31 +2,24 @@ package handlers
 
 import (
 	"fmt"
+	auth "forum/internal/authentication"
 	"html/template"
 	"net/http"
 )
 
-type LoginMessages struct {
-	NotFound          bool
-	WrongPassword     bool
-	SuccesfulRegister bool // Gives user feedback on login page after succesful registration
-}
-
-var LoginMsgs LoginMessages
-
 func Login(w http.ResponseWriter, r *http.Request) {
 
-	if RegMsgs.Succesful { // If registration was succesful
-		LoginMsgs.SuccesfulRegister = true
+	if auth.RegMsgs.Succesful { // If registration was succesful
+		auth.LoginMsgs.SuccesfulRegister = true
 	}
 	tpl, _ := template.ParseFiles("./templates/login.html")
-	err := tpl.Execute(w, LoginMsgs) // LoginMsgs is created in Login
+	err := tpl.Execute(w, auth.LoginMsgs) // LoginMsgs is created in Login
 	if err != nil {
 		fmt.Println(err)
 
 		http.Error(w, "500 Internal Server error", 500)
 		return
 	}
-	RegMsgs.Succesful = false   // Reset the registration message after we have been redirected to login page
-	LoginMsgs = LoginMessages{} // Reset the login messages or they wont change upon reloading the page
+	auth.RegMsgs.Succesful = false        // Reset the registration message after we have been redirected to login page
+	auth.LoginMsgs = auth.LoginMessages{} // Reset the login messages or they wont change upon reloading the page
 }
