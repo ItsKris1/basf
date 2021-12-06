@@ -8,17 +8,15 @@ import (
 	"net/http"
 )
 
-type RegisterMessages struct {
+type RegisterInformation struct {
 	TakenUn     bool // taken username
 	TakenEmail  bool // taken email
 	PswrdsNotEq bool // user typed passwords dont match
-	Succesful   bool // tracks whether registration was successful
 }
 
-var RegMsgs RegisterMessages
+var RegInfo RegisterInformation
 
 func RegisterAuth(w http.ResponseWriter, r *http.Request) {
-	var db = db.New()
 
 	if r.Method == "POST" {
 		if err := r.ParseForm(); err != nil {
@@ -28,17 +26,33 @@ func RegisterAuth(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		username := r.FormValue("username")
-		email := r.FormValue("email")
-		password1 := r.FormValue("password")
-		password2 := r.FormValue("password2")
+		var (
+			username  = r.FormValue("username")
+			email     = r.FormValue("email")
+			password1 = r.FormValue("password")
+			password2 = r.FormValue("password2")
 
-		unExists := db.RowExists("username", username) // un - username
-		emailExists := db.RowExists("email", email)
-		pwrdsMatch := (password1 == password2)
+			db           = db.New()
+			invalidInput = false
+		)
+
+		if db.RowExists("username", username) { // if the username exists
+			RegInfo.TakenUn = true
+			invalidInput = true
+		}
+
+		if db.RowExists("email", password1) { // if the email exists
+			RegInfo.TakenEmail = true
+			invalidInput = true
+		}
+
+		if !(password1 == password2) {
+			RegInfo.PswrdsNotEq = true
+			invalidInput = true
+		}
 
 		// Checking user entered username and email
-		if !unExists && !emailExists && pwrdsMatch {
+		if !invalidInput {
 
 			password1, err := hash.Password(password1)
 			if err != nil {
@@ -47,20 +61,10 @@ func RegisterAuth(w http.ResponseWriter, r *http.Request) {
 
 			db.AddUser(username, password1, email)
 
-			RegMsgs.Succesful = true
+			LoginInfo.SuccesfulRegister = true
 			http.Redirect(w, r, "/login", 302)
 
 		} else {
-			// Boolean values for displaying errors in registration
-			if !pwrdsMatch {
-				RegMsgs.PswrdsNotEq = true
-			}
-			if unExists {
-				RegMsgs.TakenUn = true
-			}
-			if emailExists {
-				RegMsgs.TakenEmail = true
-			}
 			http.Redirect(w, r, "/register", 302)
 		}
 

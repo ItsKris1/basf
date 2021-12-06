@@ -24,8 +24,7 @@
     {{ if .SuccesfulRegister}}
     <h3>Registration was succesful!</h3>
     {{ end }}
-
-    <form action="/loginauth" method="get">
+    <form action="/loginauth" method="post">
         {{ if .NotFound }}
         <div class="error_msg">
             <p>User doesnt exist</p>

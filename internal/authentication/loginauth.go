@@ -5,56 +5,66 @@ import (
 	"fmt"
 	"forum/internal/db"
 	"forum/internal/hash"
-	"forum/internal/sessions"
 	"net/http"
 )
 
-type LoginMessages struct {
+type LoginInformation struct {
 	NotFound          bool
 	WrongPassword     bool
-	SuccesfulRegister bool // Gives user feedback on login page after succesful registration
-	Username          string
+	SuccesfulRegister bool // Displays message on login screen after succesful registration
+	LoggedUser        string
 }
 
-var LoginMsgs LoginMessages
+var LoginInfo LoginInformation
 
 func LoginAuth(w http.ResponseWriter, r *http.Request) {
-	db := db.New()
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			fmt.Println(err)
+			http.Error(w, "400 Bad Request", 400)
+			return
+		}
 
-	if err := r.ParseForm(); err != nil {
-		fmt.Println(err)
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+
+		db := db.New()
+		if credentialsCorrect(username, password, db.Conn) {
+
+			LoginInfo.LoggedUser = username
+			http.Redirect(w, r, "/", 302)
+		} else {
+			http.Redirect(w, r, "/login", 302)
+		}
+
+	} else {
 		http.Error(w, "400 Bad Request", 400)
-		return
 	}
 
-	username := r.Form.Get("username")
-	password := r.Form.Get("password")
+}
 
+func credentialsCorrect(username string, password string, db *sql.DB) bool {
 	stmt := fmt.Sprintf("SELECT password FROM user WHERE username = ?")
-	row := db.Conn.QueryRow(stmt, username)
+	row := db.QueryRow(stmt, username)
 
 	var passwordHash string
 
 	switch err := row.Scan(&passwordHash); err {
-	case sql.ErrNoRows:
-		LoginMsgs.NotFound = true
-
-	// Match was found
 	case nil:
-		if comparePwrds := hash.CheckPasswordHash(password, passwordHash); comparePwrds { // Compare passwords
-			sessions.GetCookie(w, r, username) // Get or create new cookie for the user
-			LoginMsgs.Username = username      // We use UserLogged to track which user is logged in
+		if passwordsEq := hash.CheckPasswordHash(password, passwordHash); passwordsEq { // Compare passwords
+			// LoginInfo.LoggedUser = username
 			fmt.Println("Logged in!")
-			http.Redirect(w, r, "/", 302)
-			return
+			return true
 
 		} else {
-			LoginMsgs.WrongPassword = true
+			LoginInfo.WrongPassword = true
 		}
 
+	case sql.ErrNoRows:
+		LoginInfo.NotFound = true
 	default:
 		fmt.Println(err)
 	}
 
-	http.Redirect(w, r, "/login", 302)
+	return false
 }
