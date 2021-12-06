@@ -13,8 +13,17 @@
     <h3>Links</h3>
     <ul>
         <li> <a href="/login">Login</a></li>
+        {{ if .}}
+        <li> <a href="/logout">Log out</a></li>
+        {{ end }}
         <li> <a href="/register">Register</a> </li>
+
+        {{ if . }}
+        <h3>Logged in as: {{ . }}</h3>
+        {{ end}}
     </ul>
+
+    
 </body>
 
 </html>

@@ -13,6 +13,7 @@ type LoginMessages struct {
 	NotFound          bool
 	WrongPassword     bool
 	SuccesfulRegister bool // Gives user feedback on login page after succesful registration
+	Username          string
 }
 
 var LoginMsgs LoginMessages
@@ -42,7 +43,7 @@ func LoginAuth(w http.ResponseWriter, r *http.Request) {
 	case nil:
 		if comparePwrds := hash.CheckPasswordHash(password, passwordHash); comparePwrds { // Compare passwords
 			sessions.GetCookie(w, r, username) // Get or create new cookie for the user
-
+			LoginMsgs.Username = username      // We use UserLogged to track which user is logged in
 			fmt.Println("Logged in!")
 			http.Redirect(w, r, "/", 302)
 			return

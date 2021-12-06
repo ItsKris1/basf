@@ -13,7 +13,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		auth.LoginMsgs.SuccesfulRegister = true
 	}
 	tpl, _ := template.ParseFiles("./templates/login.html")
-	err := tpl.Execute(w, auth.LoginMsgs) // LoginMsgs is created in Login
+	err := tpl.Execute(w, auth.LoginMsgs) // LoginMsgs is created in LoginAuth
 	if err != nil {
 		fmt.Println(err)
 
