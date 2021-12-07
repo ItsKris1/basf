@@ -55,7 +55,6 @@ func credentialsCorrect(username string, password string, db *sql.DB) bool {
 	case nil:
 		if passwordsEq := hash.CheckPasswordHash(password, passwordHash); passwordsEq { // Compare passwords
 			// LoginInfo.LoggedUser = username
-			fmt.Println("Logged in!")
 			return true
 
 		} else {

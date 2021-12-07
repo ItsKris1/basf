@@ -1,4 +1,10 @@
 {{template "base" .}} 
 {{define "content"}}
-<h1>Home page</h1>
+<a class="btn btn-primary" href="/createpost" role="button">Create a post</a>
+
+<div class="box" style="border: 1px solid black; width: 80%">
+    <h3>{{ .Title }}</h3>
+    <p>{{ .Text }}</p>
+
+</div>
 {{end}}

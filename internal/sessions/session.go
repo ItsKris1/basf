@@ -4,11 +4,46 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/db"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+func CheckSession(w http.ResponseWriter, r *http.Request) {
+	db := db.New().Conn
+	cookie, err := r.Cookie("session")
+
+	if err != nil {
+		fmt.Println("You are logged out!")
+	} else {
+
+		cookieid := cookie.Value
+
+		row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieid)
+		var res = ""
+		switch err = row.Scan(&res); err {
+		case sql.ErrNoRows:
+			// User is logged out
+			fmt.Println(err)
+
+		case nil:
+			stmt, err := db.Prepare("UPDATE sessions SET uuid = ? WHERE userid = ?")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			stmt.Exec(cookieid, res)
+			fmt.Println("You are logged in! Check Cookie")
+
+		default:
+			fmt.Println(err)
+		}
+
+	}
+
+}
 
 func CreateSession(w http.ResponseWriter, r *http.Request, username string) {
 	cookie, err := r.Cookie("session")
