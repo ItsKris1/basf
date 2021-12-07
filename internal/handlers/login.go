@@ -4,12 +4,16 @@ import (
 	"fmt"
 	auth "forum/internal/authentication"
 	"html/template"
+	"log"
 	"net/http"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	tpl, _ := template.ParseFiles("./templates/login.html")
-	err := tpl.Execute(w, auth.LoginInfo)
+	tpl, err := template.ParseFiles("./templates/login.html", "./templates/base.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = tpl.ExecuteTemplate(w, "login.html", auth.LoginInfo)
 	if err != nil {
 		fmt.Println(err)
 

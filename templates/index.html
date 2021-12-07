@@ -1,29 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum</title>
-</head>
-
-<body>
-    <h1>Home page</h1>
-    <h3>Links</h3>
-    <ul>
-        <li> <a href="/login">Login</a></li>
-        {{ if .}}
-        <li> <a href="/logout">Log out</a></li>
-        {{ end }}
-        <li> <a href="/register">Register</a> </li>
-
-        {{ if . }}
-        <h3>Logged in as: {{ . }}</h3>
-        {{ end}}
-    </ul>
-
-    
-</body>
-
-</html>
+{{template "base" .}} 
+{{define "content"}}
+<h1>Home page</h1>
+{{end}}

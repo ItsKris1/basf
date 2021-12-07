@@ -2,15 +2,17 @@ package handlers
 
 import (
 	"fmt"
-	auth "forum/internal/authentication"
 	"html/template"
+	"log"
 	"net/http"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	tpl, _ := template.ParseFiles("./templates/index.html")
-
-	err := tpl.Execute(w, auth.LoginInfo.LoggedUser)
+	tpl, err := template.ParseFiles("./templates/base.html", "./templates/index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = tpl.ExecuteTemplate(w, "index.html", nil)
 	if err != nil {
 		fmt.Println(err)
 
