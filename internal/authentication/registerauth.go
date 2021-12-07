@@ -31,10 +31,10 @@ func RegisterAuth(w http.ResponseWriter, r *http.Request) {
 			email     = r.FormValue("email")
 			password1 = r.FormValue("password")
 			password2 = r.FormValue("password2")
-
-			db           = db.New()
-			invalidInput = false
 		)
+
+		db := db.New()
+		invalidInput := false
 
 		if db.RowExists("username", username) { // if the username exists
 			RegInfo.TakenUn = true

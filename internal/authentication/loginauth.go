@@ -44,7 +44,7 @@ func LoginAuth(w http.ResponseWriter, r *http.Request) {
 }
 
 func credentialsCorrect(username string, password string, db *sql.DB) bool {
-	stmt := fmt.Sprintf("SELECT password FROM user WHERE username = ?")
+	stmt := fmt.Sprintf("SELECT password FROM users WHERE username = ?")
 	row := db.QueryRow(stmt, username)
 
 	var passwordHash string

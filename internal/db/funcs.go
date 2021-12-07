@@ -24,7 +24,7 @@ func New() Database {
 }
 
 func (db Database) AddUser(username, password, email string) {
-	stmt, err := db.Conn.Prepare("INSERT INTO user (username, password, email) VALUES (?, ?, ?)")
+	stmt, err := db.Conn.Prepare("INSERT INTO users (username, password, email) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func (db Database) AddUser(username, password, email string) {
 }
 
 func (db Database) RowExists(field, value string) bool {
-	stmt := fmt.Sprintf(`SELECT %v FROM user WHERE %v = ?`, field, field)
+	stmt := fmt.Sprintf(`SELECT %v FROM users WHERE %v = ?`, field, field)
 	row := db.Conn.QueryRow(stmt, value)
 
 	switch err := row.Scan(&value); err {
@@ -50,7 +50,7 @@ func (db Database) RowExists(field, value string) bool {
 }
 
 func (db Database) AddUUID(username string, uuid uuid.UUID) {
-	stmt, err := db.Conn.Prepare("UPDATE user SET uuid = ? WHERE username = ?")
+	stmt, err := db.Conn.Prepare("UPDATE users SET uuid = ? WHERE username = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
