@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"forum/internal/db"
 	"forum/internal/hash"
+	"forum/internal/sessions"
 	"net/http"
 )
 
@@ -32,6 +33,7 @@ func LoginAuth(w http.ResponseWriter, r *http.Request) {
 		if credentialsCorrect(username, password, db.Conn) {
 
 			LoginInfo.LoggedUser = username
+			sessions.CreateSession(w, r, username)
 			http.Redirect(w, r, "/", 302)
 		} else {
 			http.Redirect(w, r, "/login", 302)

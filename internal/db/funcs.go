@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-
-	"github.com/google/uuid"
 )
 
 type Database struct {
@@ -47,12 +45,4 @@ func (db Database) RowExists(field, value string) bool {
 		log.Println(err)
 		return false
 	}
-}
-
-func (db Database) AddUUID(username string, uuid uuid.UUID) {
-	stmt, err := db.Conn.Prepare("UPDATE users SET uuid = ? WHERE username = ?")
-	if err != nil {
-		log.Fatal(err)
-	}
-	stmt.Exec(uuid, username)
 }
