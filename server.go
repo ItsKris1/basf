@@ -9,8 +9,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+func ignoreFavicon(w http.ResponseWriter, r *http.Request) {}
+
 func main() {
 	http.HandleFunc("/", handlers.Index)
+	http.HandleFunc("/favicon.ico", ignoreFavicon)
 	http.HandleFunc("/register", handlers.Register)
 	http.HandleFunc("/registerauth", auth.RegisterAuth)
 	http.HandleFunc("/login", handlers.Login)

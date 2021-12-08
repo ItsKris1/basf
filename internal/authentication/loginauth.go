@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/db"
+	"forum/internal/errors"
 	"forum/internal/hash"
 	"forum/internal/sessions"
 	"net/http"
@@ -32,8 +33,14 @@ func LoginAuth(w http.ResponseWriter, r *http.Request) {
 		db := db.New()
 		if credentialsCorrect(username, password, db.Conn) {
 
-			LoginInfo.LoggedUser = username
-			sessions.CreateSession(w, r, username)
+			row := db.Conn.QueryRow("SELECT id FROM users WHERE username = ?", username)
+
+			var userid int
+			if err := row.Scan(&userid); err != nil { // Copy id of the username to the variable USERID
+				errors.InternalServerError(w, err)
+			}
+
+			sessions.CreateSession(w, r, userid)
 			http.Redirect(w, r, "/", 302)
 		} else {
 			http.Redirect(w, r, "/login", 302)

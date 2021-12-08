@@ -4,82 +4,75 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/db"
-	"log"
+	"forum/internal/errors"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
 )
 
+type User struct {
+	ID int
+}
+
+var UserInfo User
+
 func CheckSession(w http.ResponseWriter, r *http.Request) {
-	db := db.New().Conn
 	cookie, err := r.Cookie("session")
 
 	if err != nil {
-		fmt.Println("You are logged out!")
+		stmt, err := db.New().Conn.Prepare("DELETE FROM sessions WHERE userid = ?")
+
+		if err != nil {
+			errors.InternalServerError(w, err)
+		}
+
+		stmt.Exec(UserInfo.ID)
+		UserInfo.ID = 0
+
 	} else {
+		db := db.New().Conn
+		row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
 
-		cookieid := cookie.Value
+		var res int
+		if err := row.Scan(&res); err == nil {
+			UserInfo.ID = res
 
-		row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieid)
-		var res = ""
-		switch err = row.Scan(&res); err {
-		case sql.ErrNoRows:
-			// User is logged out
-			fmt.Println(err)
-
-		case nil:
-			stmt, err := db.Prepare("UPDATE sessions SET uuid = ? WHERE userid = ?")
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			stmt.Exec(cookieid, res)
-			fmt.Println("You are logged in! Check Cookie")
-
-		default:
-			fmt.Println(err)
+		} else {
+			errors.InternalServerError(w, err)
 		}
 
 	}
 
 }
 
-func CreateSession(w http.ResponseWriter, r *http.Request, username string) {
+func CreateSession(w http.ResponseWriter, r *http.Request, userid int) {
 	cookie, err := r.Cookie("session")
 
-	if err != nil { // if cookie doesnt exist
-		uuid := uuid.New()
-		myTime := time.Now().UTC()
-		fiveMinutes := myTime.Add(time.Minute * 5)
-
-		// Creating the cookie
+	if err != nil {
+		uuid := uuid.New().String()
+		timeNow := time.Now()
 		cookie = &http.Cookie{
 			Name:    "session",
-			Value:   uuid.String(),
-			Expires: fiveMinutes,
+			Value:   uuid,
+			Expires: timeNow.Add(time.Second * 30),
 		}
 
 		http.SetCookie(w, cookie)
-
 		db := db.New()
-		AddSession(db.Conn, username, uuid.String(), myTime) // Adding session to db
-	}
+		AddSession(db.Conn, userid, uuid, timeNow, w) // Adding session to db
 
-	fmt.Println(cookie)
+	} else {
+		fmt.Println("Cookie cant exist!")
+		errors.InternalServerError(w, err)
+	}
 }
 
-func AddSession(db *sql.DB, username string, uuid string, timeNow time.Time) {
-	row := db.QueryRow("SELECT id FROM users WHERE username = ?", username)
-
-	var userid string
-	if err := row.Scan(&userid); err != nil { // Copy id of the username to the variable USERID
-		panic(err)
-	}
+func AddSession(db *sql.DB, userid int, uuid string, timeNow time.Time, w http.ResponseWriter) {
 
 	stmt, err := db.Prepare("INSERT INTO sessions (userid, uuid, creation_date) VALUES (?, ?, ?)")
 	if err != nil {
-		panic(err)
+		errors.InternalServerError(w, err)
 	}
 
 	stmt.Exec(userid, uuid, timeNow.Format(time.ANSIC))
