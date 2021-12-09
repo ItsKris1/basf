@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"forum/internal/env"
+	"forum/internal/env" // imports Env struct, where we store the db connection
 	"forum/internal/handler"
 	"forum/internal/handler/auth"
 	"log"
@@ -16,6 +16,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Makes an environment for Database connection
 	env := &env.Env{DB: db}
 
 	http.HandleFunc("/", handler.Index(env))

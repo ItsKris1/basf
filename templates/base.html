@@ -47,6 +47,15 @@
                     </li>
                     {{ else }}
                     <li class="nav-item">
+                      <a class="nav-link" href="#">
+                        <span class="navbar-text">User: </span> {{ .UserInfo.Username}}
+                      </a>
+
+                    </li>
+                    
+                
+
+                    <li class="nav-item">
                       <a class="nav-link" href="/logout">Log out</a>
                     </li>
                     {{ end}}
