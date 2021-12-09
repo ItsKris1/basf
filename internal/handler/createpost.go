@@ -57,7 +57,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				http.Error(w, err.Error(), 500)
 				return
 			}
-
+			fmt.Println(postInfo.Title, postInfo.Body, postInfo.UserID)
 			stmt.Exec(postInfo.Title, postInfo.Body, postInfo.UserID)
 		}
 

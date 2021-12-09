@@ -35,13 +35,27 @@ func Create(userid int, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func AddSession(db *sql.DB, userid int, uuid string, timeNow time.Time, w http.ResponseWriter) {
+	row := db.QueryRow("SELECT userid FROM sessions WHERE userid = ?", userid)
 
+	if err := row.Scan(&userid); err == nil { // If that UserID already has existing sessions we delete them
+		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?")
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		stmt.Exec(userid)
+
+	} else if err != sql.ErrNoRows { // If its not nil or sql.ErrNoRows then another error occured
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Adding the session into db
 	stmt, err := db.Prepare("INSERT INTO sessions (userid, uuid, creation_date) VALUES (?, ?, ?)")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	stmt.Exec(userid, uuid, timeNow.Format(time.ANSIC))
 
 }

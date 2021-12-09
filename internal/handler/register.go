@@ -3,7 +3,7 @@ package handler
 import (
 	"forum/internal/handler/auth"
 	"forum/internal/session"
-	"html/template"
+	"forum/internal/tpl"
 	"net/http"
 )
 
@@ -19,17 +19,7 @@ func Register() http.HandlerFunc {
 			UserInfo: session.UserInfo,
 		}
 
-		tpl, err := template.ParseFiles("./templates/register.html", "./templates/base.html")
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-
-		err = tpl.ExecuteTemplate(w, "register.html", registerPage)
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
+		tpl.RenderTemplates(w, "register.html", registerPage, "./templates/register.html", "./templates/base.html")
 
 		auth.RegInfo = auth.RegisterInformation{} // Reset the login messages or they wont change upon reloading the page
 	}

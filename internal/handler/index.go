@@ -3,7 +3,7 @@ package handler
 import (
 	"forum/internal/env"
 	"forum/internal/session"
-	"html/template"
+	"forum/internal/tpl"
 	"net/http"
 )
 
@@ -19,16 +19,7 @@ func Index(env *env.Env) http.HandlerFunc {
 			UserInfo: session.UserInfo,
 		}
 
-		tpl, err := template.ParseFiles("./templates/base.html", "./templates/index.html")
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
+		tpl.RenderTemplates(w, "index.html", homeData, "./templates/base.html", "./templates/index.html")
 
-		err = tpl.ExecuteTemplate(w, "index.html", homeData)
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
 	}
 }

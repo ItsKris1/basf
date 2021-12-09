@@ -5,8 +5,8 @@ import (
 	"text/template"
 )
 
-func RenderTemplates(w http.ResponseWriter, execTpl string, data interface{}, names ...string) {
-	tpl, err := template.ParseFiles(names...)
+func RenderTemplates(w http.ResponseWriter, execTpl string, data interface{}, parseTpls ...string) {
+	tpl, err := template.ParseFiles(parseTpls...)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
