@@ -20,13 +20,12 @@ func main() {
 	env := &env.Env{DB: db}
 
 	http.HandleFunc("/", handler.Index(env))
-
 	http.HandleFunc("/register", handler.Register())
 	http.HandleFunc("/registerauth", auth.RegisterAuth(env))
 	http.HandleFunc("/login", handler.Login())
 	http.HandleFunc("/loginauth", auth.LoginAuth(env))
 	http.HandleFunc("/logout", handler.Logout(env))
-	http.HandleFunc("/createpost", handler.CreatePost())
+	http.HandleFunc("/createpost", handler.CreatePost(env))
 
 	http.HandleFunc("/favicon.ico", ignoreFavicon)
 	if err := http.ListenAndServe(":8000", nil); err != nil {

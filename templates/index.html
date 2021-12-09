@@ -1,5 +1,6 @@
 {{template "base" .}} 
 {{define "content"}}
+{{ if .UserInfo.ID}}
 <a class="btn btn-primary" href="/createpost" role="button">Create a post</a>
-
+{{ end }}
 {{end}}

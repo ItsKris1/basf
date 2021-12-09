@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/env"
-	"forum/internal/errors"
 	"forum/internal/hash"
 	"forum/internal/session"
 	"net/http"
@@ -75,7 +74,7 @@ func credentialsCorrect(username string, password string, db *sql.DB, w http.Res
 	case sql.ErrNoRows:
 		LoginInfo.NotFound = true
 	default:
-		errors.Check500(w, err)
+		fmt.Println(err)
 	}
 
 	return false

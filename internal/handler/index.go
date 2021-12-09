@@ -2,7 +2,6 @@ package handler
 
 import (
 	"forum/internal/env"
-	"forum/internal/errors"
 	"forum/internal/session"
 	"html/template"
 	"net/http"
@@ -21,9 +20,15 @@ func Index(env *env.Env) http.HandlerFunc {
 		}
 
 		tpl, err := template.ParseFiles("./templates/base.html", "./templates/index.html")
-		errors.Check500(w, err)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 		err = tpl.ExecuteTemplate(w, "index.html", homeData)
-		errors.Check500(w, err)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	}
 }

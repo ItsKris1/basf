@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"forum/internal/errors"
 	"forum/internal/handler/auth"
 	"forum/internal/session"
 	"html/template"
@@ -21,10 +20,16 @@ func Login() http.HandlerFunc {
 		}
 
 		tpl, err := template.ParseFiles("./templates/login.html", "./templates/base.html")
-		errors.Check500(w, err)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 		err = tpl.ExecuteTemplate(w, "login.html", loginPage)
-		errors.Check500(w, err)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 		auth.LoginInfo = auth.LoginInformation{} // Reset the login messages or they wont change upon reloading the
 

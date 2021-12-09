@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/env"
-	"forum/internal/errors"
 	"forum/internal/hash"
 	"log"
 	"net/http"
@@ -56,8 +55,7 @@ func RegisterAuth(env *env.Env) http.HandlerFunc {
 			// Checking user entered username and email
 			if !invalidInput {
 
-				password1, err := hash.Password(password1)
-				errors.Check500(w, err)
+				password1, _ := hash.Password(password1)
 
 				AddUser(username, password1, email, db)
 
