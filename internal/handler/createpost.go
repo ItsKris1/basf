@@ -31,14 +31,13 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				return
 			}
 
-			// search for user id from sessions to see which user created a post
-			// and scan the found user id into PostDetails
 			db := env.DB
 			row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
 
 			var userid int
 			if err := row.Scan(&userid); err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
 

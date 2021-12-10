@@ -9,5 +9,13 @@
     {{ $post.Title}}
     {{ $post.Body}}
 </div>
+{{ if $.UserInfo.ID}}
+<div class="comment">
+    <form action="/addcomment?post={{$post.PostID}}" method="post">
+        <textarea name="body" id="body" cols="30" rows="5"></textarea>
+        <button type="submit">Add comment</button>
+    </form>
+</div>
+{{end}}
 {{end}}
 {{end}}

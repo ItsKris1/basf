@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/env"
 	"forum/internal/session"
 	"forum/internal/tpl"
@@ -14,6 +15,7 @@ type HomePage struct {
 }
 
 type Post struct {
+	PostID   int
 	Username string
 	Title    string
 	Body     string
@@ -30,6 +32,7 @@ func Index(env *env.Env) http.HandlerFunc {
 		if posts, err := allPosts(env.DB); err == nil { // If err is nil, we know we got all the posts
 			homeData.AllPosts = posts
 		} else {
+			fmt.Println(err)
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -41,8 +44,9 @@ func Index(env *env.Env) http.HandlerFunc {
 
 func allPosts(db *sql.DB) ([]Post, error) {
 
-	rows, err := db.Query("SELECT title, body, userid FROM posts")
+	rows, err := db.Query("SELECT * FROM posts")
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -53,7 +57,7 @@ func allPosts(db *sql.DB) ([]Post, error) {
 		var post Post
 		var userid int
 
-		if err := rows.Scan(&post.Title, &post.Body, &userid); err != nil {
+		if err := rows.Scan(&post.PostID, &userid, &post.Title, &post.Body); err != nil {
 			return posts, err
 		}
 

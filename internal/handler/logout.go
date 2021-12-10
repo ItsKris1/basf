@@ -12,16 +12,17 @@ func Logout(env *env.Env) http.HandlerFunc {
 		db := env.DB
 
 		cookie, err := r.Cookie("session")
-		if err != nil {
-			log.Fatal(err)
+		if err != nil { // If there is no cookie we dont have to do anyhing
+			return
 		}
 
-		cookie.Expires = time.Unix(0, 0)
 		stmt, err := db.Prepare("DELETE FROM sessions WHERE uuid = ?")
 		if err != nil {
 			log.Fatal(err)
 		}
 		stmt.Exec(cookie.Value)
+
+		cookie.Expires = time.Unix(0, 0)
 		http.SetCookie(w, cookie)
 
 		http.Redirect(w, r, "/", 302)
