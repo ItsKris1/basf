@@ -42,23 +42,22 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				Body:  r.FormValue("body"),
 			}
 
+			// search for user id from sessions to see which user created a post
 			db := env.DB
 			row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
-
-			var userid int
-			if err := row.Scan(&userid); err != nil { // If err is nil, it found a match
+			if err := row.Scan(&postInfo.UserID); err != nil { // If err is nil, it found a match
 				http.Error(w, err.Error(), 500)
 				return
 			}
-			// add the post to db
 
+			// add the post to database with user id
 			stmt, err := db.Prepare("INSERT INTO posts (title, body, userid) VALUES (?, ?, ?)")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			}
-			fmt.Println(postInfo.Title, postInfo.Body, postInfo.UserID)
 			stmt.Exec(postInfo.Title, postInfo.Body, postInfo.UserID)
+			http.Redirect(w, r, "/", 302)
 		}
 
 		tpl.RenderTemplates(w, "createpost.html", postPage, "./templates/createpost.html", "./templates/base.html")
