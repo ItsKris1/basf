@@ -1,6 +1,13 @@
-{{template "base" .}} 
+{{template "base" .}}
 {{define "content"}}
 {{ if .UserInfo.ID}}
 <a class="btn btn-primary" href="/createpost" role="button">Create a post</a>
 {{ end }}
+{{ range $post := .AllPosts }}
+<div class="post">
+    {{ $post.Username}}
+    {{ $post.Title}}
+    {{ $post.Body}}
+</div>
+{{end}}
 {{end}}

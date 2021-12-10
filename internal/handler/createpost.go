@@ -8,15 +8,8 @@ import (
 	"net/http"
 )
 
-type PostInfo struct {
-	UserID int
-	Title  string
-	Body   string
-}
-
 type PostPage struct {
 	UserInfo session.User
-	PostInfo PostInfo
 }
 
 func CreatePost(env *env.Env) http.HandlerFunc {
@@ -37,15 +30,14 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				http.Error(w, err.Error(), 400)
 				return
 			}
-			postInfo := PostInfo{
-				Title: r.FormValue("title"),
-				Body:  r.FormValue("body"),
-			}
 
 			// search for user id from sessions to see which user created a post
+			// and scan the found user id into PostDetails
 			db := env.DB
 			row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
-			if err := row.Scan(&postInfo.UserID); err != nil { // If err is nil, it found a match
+
+			var userid int
+			if err := row.Scan(&userid); err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			}
@@ -56,7 +48,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				http.Error(w, err.Error(), 500)
 				return
 			}
-			stmt.Exec(postInfo.Title, postInfo.Body, postInfo.UserID)
+			stmt.Exec(r.FormValue("title"), r.FormValue("body"), userid)
 			http.Redirect(w, r, "/", 302)
 		}
 
