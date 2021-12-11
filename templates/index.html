@@ -3,15 +3,24 @@
 {{ if .UserInfo.ID}}
 <a class="btn btn-primary" href="/createpost" role="button">Create a post</a>
 {{ end }}
+
+
+
 {{ range $post := .AllPosts }}
-<div class="post">
-    {{ $post.Username}}
-    {{ $post.Title}}
-    {{ $post.Body}}
+
+<div class="card border-secondary mt-3 w-75 mx-auto">
+    <h5 class="card-header">Everyday electronics</h5>
+    <div class="card-body">
+        <p class="card-text"><a href="/post?id={{$post.ID}}">{{$post.Title}}</a> </p>
+
+
+        <small class="text-muted">Created by Kristofer</small>
+    </div>
 </div>
+
 {{ if $.UserInfo.ID}}
 <div class="comment">
-    <form action="/addcomment?post={{$post.PostID}}" method="post">
+    <form action="/addcomment?post={{$post.ID}}" method="post">
         <textarea name="body" id="body" cols="30" rows="5"></textarea>
         <button type="submit">Add comment</button>
     </form>

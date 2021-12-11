@@ -27,8 +27,11 @@ func main() {
 	http.HandleFunc("/logout", handler.Logout(env))
 
 	http.HandleFunc("/createpost", handler.CreatePost(env))
+	http.HandleFunc("/post", handler.ViewPost(env))
 	http.HandleFunc("/addcomment", handler.AddComment(env))
 
+	fs := http.FileServer(http.Dir("./assets"))
+	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
 	http.HandleFunc("/favicon.ico", ignoreFavicon)
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal(err)

@@ -7,11 +7,7 @@ import (
 	"strconv"
 )
 
-type Comment struct {
-	Body   string
-	PostID int
-	UserID int
-}
+
 
 func AddComment(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +24,10 @@ func AddComment(env *env.Env) http.HandlerFunc {
 
 		db := env.DB
 
-		postid, err := checkPostID(db, r.URL.Query().Get("post")) // checkPostID checks if the query value is valid and it exists
+		queryValue := r.URL.Query().Get("post")
+
+		// CheckQuery checks if the query value is valid and it exists
+		postid, err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", queryValue)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
@@ -64,16 +63,16 @@ func getUserID(db *sql.DB, cookieVal string) (int, error) {
 	return userid, nil
 }
 
-// Checks PostID from URL query by checking if it can be converted to an integer and if it exists
-func checkPostID(db *sql.DB, postid string) (string, error) {
-	if _, err := strconv.Atoi(postid); err != nil {
+// Checks the URL query by checking if its values can be converted to an integer and if it exists in database
+func CheckURLQuery(db *sql.DB, dbquery string, value string) (string, error) {
+	if _, err := strconv.Atoi(value); err != nil {
 		return "", err
 	}
 
-	if err := db.QueryRow("SELECT postid FROM posts WHERE postid = ?", postid).Scan(&postid); err != nil {
+	if err := db.QueryRow(dbquery, value).Scan(&value); err != nil {
 		return "", err
 
 	}
 
-	return postid, nil
+	return value, nil
 }

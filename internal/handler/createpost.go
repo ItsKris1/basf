@@ -8,13 +8,14 @@ import (
 	"net/http"
 )
 
-type PostPage struct {
+// "createpost.html" uses "base" template and the template requires UserInfo to work
+type Navbar struct {
 	UserInfo session.User
 }
 
 func CreatePost(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		postPage := PostPage{
+		navBar := Navbar{
 			UserInfo: session.UserInfo,
 		}
 
@@ -51,7 +52,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 			http.Redirect(w, r, "/", 302)
 		}
 
-		tpl.RenderTemplates(w, "createpost.html", postPage, "./templates/createpost.html", "./templates/base.html")
+		tpl.RenderTemplates(w, "createpost.html", navBar, "./templates/createpost.html", "./templates/base.html")
 	}
 
 }

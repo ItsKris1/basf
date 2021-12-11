@@ -15,7 +15,7 @@ type HomePage struct {
 }
 
 type Post struct {
-	PostID   int
+	ID       int
 	Username string
 	Title    string
 	Body     string
@@ -57,7 +57,7 @@ func allPosts(db *sql.DB) ([]Post, error) {
 		var post Post
 		var userid int
 
-		if err := rows.Scan(&post.PostID, &userid, &post.Title, &post.Body); err != nil {
+		if err := rows.Scan(&post.ID, &userid, &post.Title, &post.Body); err != nil {
 			return posts, err
 		}
 

@@ -1,0 +1,38 @@
+{{template "base" .}}
+{{ define "content"}}
+
+<div class="card w-50 mb-3 mx-auto">
+    <div class="row g-0">
+        <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
+            <p class="card-text my-1">{{.Post.Username}}</p>
+            <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
+
+        </div>
+        <div class="col-md-8 w-75 ">
+            <div class="card-body h-100 d-flex flex-column justify-content-center">
+                <h5 class="card-title">{{.Post.Title}}</h5>
+                <p class="card-text">{{.Post.Body}}</p>
+                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{ range .Comments }}
+<div class="card w-50 mb-3 mx-auto">
+    <div class="row g-0">
+        <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
+            <p class="card-text my-1">{{.Username}}</p>
+            <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
+
+        </div>
+        <div class="col-md-8 w-75 ">
+            <div class="card-body h-100 d-flex flex-column justify-content-center">
+
+                <p class="card-text">{{.Body}}</p>
+                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            </div>
+        </div>
+    </div>
+</div> {{ end }} {{ end }}
