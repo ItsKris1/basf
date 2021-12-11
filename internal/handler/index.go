@@ -9,11 +9,6 @@ import (
 	"net/http"
 )
 
-type HomePage struct {
-	UserInfo session.User
-	AllPosts []Post
-}
-
 type Post struct {
 	ID       int
 	Username string
@@ -21,23 +16,27 @@ type Post struct {
 	Body     string
 }
 
+type IndexPage struct {
+	UserInfo session.User
+	AllPosts []Post
+}
+
 func Index(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session.Check(env.DB, w, r) // Every time the user goes to home page it checks if he is logged in
 
-		homeData := HomePage{
-			UserInfo: session.UserInfo, // UserInfo has details which user is logged in
+		indexPage := IndexPage{
+			UserInfo: session.UserInfo, // We need UserInfo for "base.html" template
 		}
 
 		if posts, err := allPosts(env.DB); err == nil { // If err is nil, we know we got all the posts
-			homeData.AllPosts = posts
+			indexPage.AllPosts = posts
 		} else {
-			fmt.Println(err)
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		tpl.RenderTemplates(w, "index.html", homeData, "./templates/base.html", "./templates/index.html")
+		tpl.RenderTemplates(w, "index.html", indexPage, "./templates/base.html", "./templates/index.html")
 
 	}
 }
@@ -61,7 +60,7 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
-		if username, err := getUsername(db, userid); err != nil {
+		if username, err := GetUsername(db, userid); err != nil {
 			return posts, err
 		} else {
 			post.Username = username
@@ -77,7 +76,7 @@ func allPosts(db *sql.DB) ([]Post, error) {
 	return posts, nil
 }
 
-func getUsername(db *sql.DB, userid int) (string, error) {
+func GetUsername(db *sql.DB, userid int) (string, error) {
 	row := db.QueryRow("SELECT username FROM users WHERE id = ?", userid)
 
 	var username string

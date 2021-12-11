@@ -8,14 +8,14 @@ import (
 	"net/http"
 )
 
-// "createpost.html" uses "base" template and the template requires UserInfo to work
-type Navbar struct {
+// "createpost.html" uses "base" template, which has a navbar what uses data from UserInfo
+type CreatePostPage struct {
 	UserInfo session.User
 }
 
 func CreatePost(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		navBar := Navbar{
+		createPostPage := CreatePostPage{
 			UserInfo: session.UserInfo,
 		}
 
@@ -23,8 +23,9 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 			cookie, err := r.Cookie("session")
 
 			if err != nil { // If there is no cookie then the session has expired
-				fmt.Println(err)
+				fmt.Println("You are not logged in")
 				http.Redirect(w, r, "/", 302)
+				return
 			}
 
 			if err := r.ParseForm(); err != nil {
@@ -32,13 +33,11 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				return
 			}
 
-			db := env.DB
-			row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
+			db := env.DB // intializes db connection
 
-			var userid int
-			if err := row.Scan(&userid); err != nil {
+			userid, err := GetUserID(db, cookie.Value) // GetUserID is from addcomment.go file
+			if err != nil {
 				http.Error(w, err.Error(), 500)
-
 				return
 			}
 
@@ -52,7 +51,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 			http.Redirect(w, r, "/", 302)
 		}
 
-		tpl.RenderTemplates(w, "createpost.html", navBar, "./templates/createpost.html", "./templates/base.html")
+		tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/createpost.html", "./templates/base.html")
 	}
 
 }

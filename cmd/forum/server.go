@@ -20,18 +20,19 @@ func main() {
 	env := &env.Env{DB: db}
 
 	http.HandleFunc("/", handler.Index(env))
-	http.HandleFunc("/register", handler.Register())
-	http.HandleFunc("/registerauth", auth.RegisterAuth(env))
-	http.HandleFunc("/login", handler.Login())
-	http.HandleFunc("/loginauth", auth.LoginAuth(env))
-	http.HandleFunc("/logout", handler.Logout(env))
-
 	http.HandleFunc("/createpost", handler.CreatePost(env))
 	http.HandleFunc("/post", handler.ViewPost(env))
 	http.HandleFunc("/addcomment", handler.AddComment(env))
 
+	http.HandleFunc("/register", auth.Register())
+	http.HandleFunc("/registerauth", auth.RegisterAuth(env))
+	http.HandleFunc("/login", auth.Login())
+	http.HandleFunc("/loginauth", auth.LoginAuth(env))
+	http.HandleFunc("/logout", auth.Logout(env))
+
 	fs := http.FileServer(http.Dir("./assets"))
 	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+
 	http.HandleFunc("/favicon.ico", ignoreFavicon)
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal(err)

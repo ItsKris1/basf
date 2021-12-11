@@ -2,12 +2,11 @@ package handler
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/env"
 	"net/http"
 	"strconv"
 )
-
-
 
 func AddComment(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -22,19 +21,24 @@ func AddComment(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		db := env.DB
+		id := r.URL.Query().Get("post") // id is the ID of the post, which we get from URL
+		db := env.DB                    // intializes db connection
 
-		queryValue := r.URL.Query().Get("post")
-
-		// CheckQuery checks if the query value is valid and it exists
-		postid, err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", queryValue)
+		// CheckQuery checks if the id from URL is valid and exists
+		postid, err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", id)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
 
-		cookie, _ := r.Cookie("session")
-		userid, err := getUserID(db, cookie.Value)
+		cookie, err := r.Cookie("session")
+		if err != nil { // If there is no active cookie we redirect the user to home page
+			fmt.Println("You are not logged in!")
+			http.Redirect(w, r, "/", 302)
+			return
+		}
+
+		userid, err := GetUserID(db, cookie.Value)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -52,7 +56,7 @@ func AddComment(env *env.Env) http.HandlerFunc {
 	}
 }
 
-func getUserID(db *sql.DB, cookieVal string) (int, error) {
+func GetUserID(db *sql.DB, cookieVal string) (int, error) {
 	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieVal)
 
 	var userid int

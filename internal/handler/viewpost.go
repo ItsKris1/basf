@@ -15,7 +15,7 @@ type Comment struct {
 	Username string
 }
 
-type PostPage struct {
+type ViewPostPage struct {
 	Post     Post // Post struct is in index.go
 	Comments []Comment
 	UserInfo session.User
@@ -24,29 +24,29 @@ type PostPage struct {
 func ViewPost(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		db := env.DB
-
 		// CheckQuery checks if the query value is valid and it exists
-		var viewPostPage PostPage
+		var viewPostPage ViewPostPage
 		viewPostPage.UserInfo = session.UserInfo
 
-		// Get the post details
+		// Get the id of the post from the URL
 		postid := r.URL.Query().Get("id")
 
+		db := env.DB // intializes db connection
 		row := db.QueryRow("SELECT * FROM posts WHERE postid = ?", postid)
-		var userid int
 
+		var userid int
 		if err := row.Scan(&viewPostPage.Post.ID, &userid, &viewPostPage.Post.Title, &viewPostPage.Post.Body); err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
 
-		viewPostPage.Post.Username, _ = getUsername(db, userid)
+		// Get the post username by userid
+		viewPostPage.Post.Username, _ = GetUsername(db, userid)
 
 		// Get the comments for that post
 		comments, err := postComments(db, postid)
 
-		if err != nil && err != sql.ErrNoRows {
+		if err != nil && err != sql.ErrNoRows { // If err is not a nil or not a sql.ErrNoRows it means we get an error we dont want.
 			http.Error(w, err.Error(), 500)
 			return
 		} else {
@@ -75,7 +75,7 @@ func postComments(db *sql.DB, postid string) ([]Comment, error) {
 			return comments, err
 		}
 
-		if username, err := getUsername(db, userid); err != nil { // getUsername is from index.go
+		if username, err := GetUsername(db, userid); err != nil { // GetUsername is from index.go
 			return comments, err
 		} else {
 			comment.Username = username
