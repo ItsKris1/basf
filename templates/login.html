@@ -1,28 +1,29 @@
 {{template "base" .}}
-    {{define "content"}}
-    <h2>Login</h2>
-    {{ if .LoginAuth.SuccesfulRegister}}
-    <h3>Registration was succesful!</h3>
-    {{ end }}
-    <form action="/loginauth" method="post">
-        {{ if .LoginAuth.NotFound }}
+{{define "content"}}
+<h2>Login</h2>
+{{ if .LoginMsgs.SuccesfulRegister}}
+<h3>Registration was succesful!</h3>
+{{ end }}
+<form action="/loginauth" method="post">
+    <!-- This form sends the entered data to loginauth, which will authenticate -->
+    {{ if .LoginMsgs.NotFound }}
+    <div class="error_msg">
+        <p>User doesnt exist</p>
+    </div>
+    {{ end}}
+    <div class="form-control">
+        Username: <input type="text" name="username" id="username" required>
+    </div>
+    <div class="form-control">
+        Password: <input type="password" name="password" id="password" required>
+        {{ if .LoginMsgs.WrongPassword}}
         <div class="error_msg">
-            <p>User doesnt exist</p>
+            <p>Wrong passwords</p>
         </div>
-        {{ end}}
-        <div class="form-control">
-            Username: <input type="text" name="username" id="username" required>
-        </div>
-        <div class="form-control">
-            Password: <input type="password" name="password" id="password" required>
-            {{ if .LoginAuth.WrongPassword}}
-            <div class="error_msg">
-                <p>Wrong passwords</p>
-            </div>
-            {{ end }}
-        </div>
+        {{ end }}
+    </div>
 
-        <button type="submit">Login</button>
-    </form>
+    <button type="submit">Login</button>
+</form>
 
-    {{end}}
+{{end}}

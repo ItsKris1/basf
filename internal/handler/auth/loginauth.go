@@ -9,48 +9,45 @@ import (
 	"net/http"
 )
 
-type LoginInformation struct {
+type LoginMessages struct {
 	NotFound          bool
 	WrongPassword     bool
 	SuccesfulRegister bool // Displays message on login screen after succesful registration
-	LoggedUser        string
 }
 
-var LoginInfo LoginInformation
+var LoginMsgs LoginMessages
 
 func LoginAuth(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			if err := r.ParseForm(); err != nil {
-				fmt.Println(err)
-				http.Error(w, "400 Bad Request", 400)
+		if r.Method != "POST" {
+			http.Error(w, "400 Bad Request", 400)
+			return
+		}
+
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "400 Bad Request", 400)
+			return
+		}
+
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+
+		db := env.DB
+		if credentialsCorrect(username, password, db, w) { // goes to check if the entered credentials are correct
+
+			row := db.QueryRow("SELECT id FROM users WHERE username = ?", username) // query for getting users Username by ID
+
+			var userid int
+			if err := row.Scan(&userid); err != nil {
+				http.Error(w, "Something went wrong on our side", 500)
 				return
 			}
 
-			username := r.FormValue("username")
-			password := r.FormValue("password")
-
-			db := env.DB
-			if credentialsCorrect(username, password, db, w) {
-
-				row := db.QueryRow("SELECT id FROM users WHERE username = ?", username)
-
-				var userid int
-				if err := row.Scan(&userid); err != nil { // Copy id of the username to the variable USERID
-					http.Error(w, "Something went wrong on our side", 500)
-					return
-				}
-
-				session.Create(userid, w, r, db)
-				http.Redirect(w, r, "/", 302)
-			} else {
-
-				http.Redirect(w, r, "/login", 302)
-			}
+			session.Create(userid, w, r, db) // creates cookie for the user and adds the information to database
+			http.Redirect(w, r, "/", 302)
 
 		} else {
-			http.Error(w, "400 Bad Request", 400)
-			return
+			http.Redirect(w, r, "/login", 302)
 		}
 
 	}
@@ -68,11 +65,11 @@ func credentialsCorrect(username string, password string, db *sql.DB, w http.Res
 			return true
 
 		} else {
-			LoginInfo.WrongPassword = true
+			LoginMsgs.WrongPassword = true
 		}
 
 	case sql.ErrNoRows:
-		LoginInfo.NotFound = true
+		LoginMsgs.NotFound = true
 	default:
 		fmt.Println(err)
 	}

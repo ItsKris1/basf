@@ -1,37 +1,37 @@
 {{template "base" .}}
 {{define "content"}}
-    <h2>Create an account</h2>
+<h2>Create an account</h2>
 
-    <form action="/registerauth" method="post">
-        <div class="form-control">
-            Email: <input type="email" name="email" id="email" required>
-            {{ if .AuthInfo.TakenEmail}}
-            <p class="error">Email already exists!</p>
-            {{ end}}
+<form action="/registerauth" method="post">
+    <div class="form-control">
+        Email: <input type="email" name="email" id="email" required>
+        {{ if .RegMsgs.TakenEmail}}
+        <p class="error">Email already exists!</p>
+        {{ end}}
 
-        </div>
-
-
-        <div class="form-control">
-            Username: <input type="text" name="username" id="username" required>
-            {{ if .AuthInfo.TakenUn}}
-            <p class="error">Username already exists!</p>
-            {{ end}}
-        </div>
-
-        <div class="form-control">
-            Password: <input type="password" name="password" id="password" required>
-            {{ if .AuthInfo.PswrdsNotEq}}
-            <p class="error">Passwords dont match!</p>
-
-            {{ end}}
-        </div>
-
-        <div class="form-control">
-            Retype password: <input type="password" name="password2" id="password2" required>
-        </div>
+    </div>
 
 
-        <button type="submit">Register</button>
-    </form>
+    <div class="form-control">
+        Username: <input type="text" name="username" id="username" required>
+        {{ if .RegMsgs.TakenUn}}
+        <p class="error">Username already exists!</p>
+        {{ end}}
+    </div>
+
+    <div class="form-control">
+        Password: <input type="password" name="password" id="password" required>
+        {{ if .RegMsgs.PswrdsNotEq}}
+        <p class="error">Passwords dont match!</p>
+
+        {{ end}}
+    </div>
+
+    <div class="form-control">
+        Retype password: <input type="password" name="password2" id="password2" required>
+    </div>
+
+
+    <button type="submit">Register</button>
+</form>
 {{end}}
