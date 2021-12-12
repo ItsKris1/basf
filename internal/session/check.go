@@ -2,14 +2,13 @@ package session
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"time"
 )
 
 type User struct {
-	ID       int // ID is for tracking, which user is having a session
-	Username string
+	ID       int    // ID is for tracking, which user is having a session
+	Username string // Display the name of the user who is logged in
 }
 
 var UserInfo User
@@ -18,35 +17,36 @@ func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie("session")
 
-	// Cookie is expired, so we delete the session from the db
+	// If cookie is not found, session has expired
 	if err != nil {
-		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?")
-		if err != nil {
-			fmt.Println(err)
+		UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
+
+		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?") // delete the expired session from db
+		if err == nil {
+			stmt.Exec(UserInfo.ID)
+
+		} else if err != sql.ErrNoRows { // If the error is not ErrNoRows, something unexpected happened
 			http.Error(w, err.Error(), 500)
 			return
 		}
-
-		stmt.Exec(UserInfo.ID)
-		UserInfo.ID = 0 // 0 means no user
 
 	} else {
-		// If cookie expires - look to who the cookie belongs to
 		row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
 
-		// If it wont find who the cookie belongs to - it just resets it
-		if err := row.Scan(&UserInfo.ID); err != nil {
+		// Get the logged in user's UserID
+		if err := row.Scan(&UserInfo.ID); err == sql.ErrNoRows { // If it wont find who the cookie belongs to - it deletes it
 			cookie.Expires = time.Unix(0, 0)
 			http.SetCookie(w, cookie)
-
-			http.Error(w, err.Error(), 500)
 			return
 
+		} else if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
 		}
 
+		// Get the logged in user's Username
 		row = db.QueryRow("SELECT username FROM users WHERE id = ?", UserInfo.ID)
 		if err := row.Scan(&UserInfo.Username); err != nil {
-			fmt.Println(err)
 			http.Error(w, err.Error(), 500)
 			return
 
