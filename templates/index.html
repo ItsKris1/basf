@@ -1,17 +1,21 @@
 {{template "base" .}}
 {{define "content"}}
 {{ if .UserInfo.ID}}
-<a class="btn btn-primary" href="/createpost" role="button">Create a post</a>
+<div class="w-75 mx-auto text-end mt-5">
+    <a class="btn btn-primary " href="/createpost" role="button">Create a post</a>
+</div>
+
 {{ end }}
 
 
 
 {{ range $post := .AllPosts }}
 
-<div class="card border-secondary mt-3 w-75 mx-auto">
+<div class="card border-secondary mt-3 w-50 mx-auto">
     <h5 class="card-header">Everyday electronics</h5>
     <div class="card-body">
-        <p class="card-text"><a href="/post?id={{$post.ID}}">{{$post.Title}}</a> </p>
+        <p class="card-text "><a href="/post?id={{$post.ID}}" class="text-dark">{{$post.Title}}</a>
+        </p>
 
 
         <small class="text-muted">Created by Kristofer</small>
