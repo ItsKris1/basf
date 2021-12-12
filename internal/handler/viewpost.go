@@ -46,11 +46,11 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 		// Get the comments for that post
 		comments, err := postComments(db, postid)
 
-		if err != nil && err != sql.ErrNoRows { // If err is not a nil or not a sql.ErrNoRows it means we get an error we dont want.
-			http.Error(w, err.Error(), 500)
-			return
-		} else {
+		if err == nil { // Only add the comments if the []Comment is not empty
 			viewPostPage.Comments = comments
+		} else if err != sql.ErrNoRows {
+			http.Error(w, err.Error(), 500) // If the error is not ErrNoRows, something unexpected happened
+			return
 		}
 
 		tpl.RenderTemplates(w, "viewpost.html", viewPostPage, "./templates/base.html", "./templates/viewpost.html")
