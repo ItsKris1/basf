@@ -1,38 +1,58 @@
 {{template "base" .}}
 {{ define "content"}}
 
-<div class="card w-50 mb-3 mx-auto">
-    <div class="row g-0">
-        <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
-            <p class="card-text my-1">{{.Post.Username}}</p>
-            <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
 
-        </div>
-        <div class="col-md-8 w-75 ">
-            <div class="card-body h-100 d-flex flex-column justify-content-center">
-                <h5 class="card-title">{{.Post.Title}}</h5>
-                <p class="card-text">{{.Post.Body}}</p>
-                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+<div class="container w-50 d-flex flex-column align-items-end gap-2">
+    {{ if .UserInfo.ID}}
+    <a class="btn btn-primary mt-3 " href="#postbtn" role="button">Comment post</a>
+    {{ end }}
+    <div class="card my-5 w-100 ">
+        <div class="row g-0">
+            <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
+                <p class="card-text my-1">{{.Post.Username}}</p>
+                <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
+
+            </div>
+            <div class="col-md-8 w-75 ">
+                <div class="card-body h-100 d-flex flex-column justify-content-center">
+                    <h5 class="card-title">{{.Post.Title}}</h5>
+                    <p class="card-text">{{.Post.Body}}</p>
+                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                </div>
             </div>
         </div>
+    </div>
+
+
+    {{ range .Comments }}
+    <div class="card mb-3 w-100">
+        <div class="row g-0">
+            <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
+                <p class="card-text my-1">{{.Username}}</p>
+                <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
+
+            </div>
+            <div class="col-md-8 w-75 ">
+                <div class="card-body h-100 d-flex flex-column justify-content-center">
+
+                    <p class="card-text">{{.Body}}</p>
+                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                </div>
+            </div>
+        </div>
+    </div> {{ end }}
+
+
+    {{ if $.UserInfo.ID}}
+
+
+    <div class="w-75" id="postbtn">
+        <form action="/addcomment?post={{.Post.ID}}" method="post">
+            <textarea class="form-control mt-5" name="body" id="body" rows="5" required></textarea>
+            <button class="btn btn-primary float-end my-3" type="submit">Post</button>
+        </form>
     </div>
 </div>
 
-
-{{ range .Comments }}
-<div class="card w-50 mb-3 mx-auto">
-    <div class="row g-0">
-        <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
-            <p class="card-text my-1">{{.Username}}</p>
-            <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
-
-        </div>
-        <div class="col-md-8 w-75 ">
-            <div class="card-body h-100 d-flex flex-column justify-content-center">
-
-                <p class="card-text">{{.Body}}</p>
-                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-            </div>
-        </div>
-    </div>
-</div> {{ end }} {{ end }}
+{{ end }}
+{{ end}}

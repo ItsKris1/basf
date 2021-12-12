@@ -51,7 +51,9 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		}
 
 		stmt.Exec(r.FormValue("body"), postid, userid)
-		http.Redirect(w, r, "/", 302)
+
+		redirectURL := fmt.Sprintf("/post?id=%v", postid) // Redirects user to the same page where he was after posting the comment
+		http.Redirect(w, r, redirectURL, 302)
 
 	}
 }
