@@ -17,7 +17,7 @@
                 <div class="card-body h-100 d-flex flex-column justify-content-center">
                     <h5 class="card-title">{{.Post.Title}}</h5>
                     <p class="card-text">{{.Post.Body}}</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                    <p class="card-text"><small class="text-muted">Created: {{ .Post.CreationDate}}</small></p>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                 <div class="card-body h-100 d-flex flex-column justify-content-center">
 
                     <p class="card-text">{{.Body}}</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                    <p class="card-text"><small class="text-muted">Created: {{.CreationDate}}</small></p>
                 </div>
             </div>
         </div>

@@ -9,10 +9,11 @@ import (
 )
 
 type Comment struct {
-	Body     string
-	PostID   int
-	UserID   int
-	Username string
+	Body         string
+	PostID       int
+	UserID       int
+	Username     string
+	CreationDate string
 }
 
 type ViewPostPage struct {
@@ -35,7 +36,7 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 		row := db.QueryRow("SELECT * FROM posts WHERE postid = ?", postid)
 
 		var userid int
-		if err := row.Scan(&viewPostPage.Post.ID, &userid, &viewPostPage.Post.Title, &viewPostPage.Post.Body); err != nil {
+		if err := row.Scan(&viewPostPage.Post.ID, &userid, &viewPostPage.Post.Title, &viewPostPage.Post.Body, &viewPostPage.Post.CreationDate); err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
@@ -59,7 +60,7 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 
 func postComments(db *sql.DB, postid string) ([]Comment, error) {
 
-	rows, err := db.Query("SELECT body, postid, userid FROM comments where postid = ?", postid)
+	rows, err := db.Query("SELECT body, postid, userid, creation_date FROM comments where postid = ?", postid)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +72,7 @@ func postComments(db *sql.DB, postid string) ([]Comment, error) {
 		var comment Comment
 		var userid int
 
-		if err := rows.Scan(&comment.Body, &comment.PostID, &userid); err != nil {
+		if err := rows.Scan(&comment.Body, &comment.PostID, &userid, &comment.CreationDate); err != nil {
 			return comments, err
 		}
 

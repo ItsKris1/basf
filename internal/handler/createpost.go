@@ -6,6 +6,7 @@ import (
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
+	"time"
 )
 
 // "createpost.html" uses "base" template, which has a navbar what uses data from UserInfo
@@ -124,12 +125,13 @@ func addPosts(db *sql.DB, r *http.Request) error {
 	}
 
 	// Add new post to database
-	stmt, err := db.Prepare("INSERT INTO posts (title, body, userid) VALUES (?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO posts (title, body, userid, creation_date) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 
-	stmt.Exec(r.FormValue("title"), r.FormValue("body"), userid)
+	timeNow := time.Now()
+	stmt.Exec(r.FormValue("title"), r.FormValue("body"), userid, timeNow.Format(time.ANSIC))
 	return nil
 
 }

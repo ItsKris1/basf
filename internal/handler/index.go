@@ -10,10 +10,11 @@ import (
 )
 
 type Post struct {
-	ID       int
-	Username string
-	Title    string
-	Body     string
+	ID           int
+	Username     string
+	Title        string
+	Body         string
+	CreationDate string
 }
 
 type IndexPage struct {
@@ -56,7 +57,7 @@ func allPosts(db *sql.DB) ([]Post, error) {
 		var post Post
 		var userid int
 
-		if err := rows.Scan(&post.ID, &userid, &post.Title, &post.Body); err != nil {
+		if err := rows.Scan(&post.ID, &userid, &post.Title, &post.Body, &post.CreationDate); err != nil {
 			return posts, err
 		}
 

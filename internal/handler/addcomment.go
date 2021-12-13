@@ -6,6 +6,7 @@ import (
 	"forum/internal/env"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func AddComment(env *env.Env) http.HandlerFunc {
@@ -44,13 +45,14 @@ func AddComment(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		stmt, err := db.Prepare("INSERT INTO comments (body, postid, userid) VALUES (?, ?, ?)")
+		stmt, err := db.Prepare("INSERT INTO comments (body, postid, userid, creation_date) VALUES (?, ?, ?, ?)")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		stmt.Exec(r.FormValue("body"), postid, userid)
+		timeNow := time.Now()
+		stmt.Exec(r.FormValue("body"), postid, userid, timeNow.Format(time.ANSIC))
 
 		redirectURL := fmt.Sprintf("/post?id=%v", postid) // Redirects user to the same page where he was after posting the comment
 		http.Redirect(w, r, redirectURL, 302)
