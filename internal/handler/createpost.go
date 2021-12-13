@@ -12,6 +12,7 @@ import (
 // "createpost.html" uses "base" template, which has a navbar what uses data from UserInfo
 type CreatePostPage struct {
 	UserInfo session.User
+	Tags     []string
 }
 
 func CreatePost(env *env.Env) http.HandlerFunc {
@@ -49,9 +50,19 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 
 			http.Redirect(w, r, "/", 302)
 			return
+		} else {
+
+			db := env.DB
+			if allTags, err := getAllTags(db); err == nil {
+				createPostPage.Tags = allTags
+			} else {
+				http.Error(w, err.Error(), 500)
+				return
+			}
+
+			tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/createpost.html", "./templates/base.html")
 		}
 
-		tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/createpost.html", "./templates/base.html")
 	}
 
 }
@@ -134,4 +145,31 @@ func addPosts(db *sql.DB, r *http.Request) error {
 	stmt.Exec(r.FormValue("title"), r.FormValue("body"), userid, timeNow.Format(time.ANSIC))
 	return nil
 
+}
+
+func getAllTags(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SELECT name FROM tags")
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var allTags []string
+
+	for rows.Next() {
+
+		var tag string
+		if err := rows.Scan(&tag); err != nil {
+			return allTags, err
+		}
+
+		allTags = append(allTags, tag)
+	}
+
+	if err = rows.Err(); err != nil {
+		return allTags, err
+	}
+
+	return allTags, nil
 }

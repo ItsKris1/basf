@@ -15,6 +15,7 @@ type Post struct {
 	Title        string
 	Body         string
 	CreationDate string
+	Tags         []string
 }
 
 type IndexPage struct {
@@ -42,6 +43,7 @@ func Index(env *env.Env) http.HandlerFunc {
 	}
 }
 
+}
 func allPosts(db *sql.DB) ([]Post, error) {
 
 	rows, err := db.Query("SELECT * FROM posts")
