@@ -13,10 +13,8 @@
     </div>
 
 
-    <select class="asd" multiple="multiple">
-        <option selected="selected">orange</option>
-        <option>white</option>
-        <option selected="selected">purple</option>
+    <select class="tag-select" multiple="multiple" name="tags" required>
+      
       </select>
     
   
@@ -27,10 +25,13 @@
 </form>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>$(document).ready(function() {
-    $('.asd').select2({
+
+<script>
+$(document).ready(function() {
+    $('.tag-select').select2({
         tags: true,
         width: "50%"
     });
-});</script>
+});
+</script>
 {{end}}
