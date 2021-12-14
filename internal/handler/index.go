@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/env"
 	"forum/internal/session"
 	"forum/internal/tpl"
@@ -15,6 +16,8 @@ type Post struct {
 	Body         string
 	CreationDate string
 	Tags         []string
+	LikeCount    int
+	DislikeCount int
 }
 
 type IndexPage struct {
@@ -73,6 +76,29 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
+		// Check if post has any likes or dislikes
+		var res int
+
+		if err := db.QueryRow("SELECT postid FROM postlikes WHERE postid = ?", post.ID).Scan(&res); err == nil {
+
+			q := "SELECT COUNT(like) FROM postlikes WHERE like = ? AND postid = ?"
+			var dislikeCount int
+
+			if err := db.QueryRow(q, 0, post.ID).Scan(&dislikeCount); err == nil {
+				post.DislikeCount = dislikeCount
+			} else if err != sql.ErrNoRows {
+				return posts, err
+			}
+
+			var likeCount int
+
+			if err := db.QueryRow(q, 1, post.ID).Scan(&likeCount); err == nil {
+				post.LikeCount = likeCount
+			} else if err != sql.ErrNoRows {
+				return posts, err
+			}
+		}
+
 		posts = append(posts, post)
 	}
 
@@ -80,7 +106,9 @@ func allPosts(db *sql.DB) ([]Post, error) {
 		return posts, err
 	}
 
+	fmt.Println(posts)
 	return posts, nil
+
 }
 
 func getPostTags(db *sql.DB, postid int) ([]string, error) {

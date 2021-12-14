@@ -46,6 +46,9 @@ func LikePost(env *env.Env) http.HandlerFunc {
 			return
 		}
 
+		http.Redirect(w, r, "/", 302)
+		return
+
 	}
 }
 

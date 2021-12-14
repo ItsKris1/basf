@@ -21,7 +21,7 @@ func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	// If cookie is not found, session has expired
 	if err != nil {
 		fmt.Println("Cookie not found lmao lool")
-
+		UserInfo.ID = 0                                                  // Resets the UserID if there is no ongoing session
 		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?") // delete the expired session from db
 		if err == nil {
 			stmt.Exec(UserInfo.ID)
