@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/internal/env"
 	"forum/internal/session"
 	"forum/internal/tpl"
@@ -63,40 +62,22 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
-		if username, err := GetUsername(db, userid); err == nil {
-			post.Username = username
-
-		} else {
+		username, err := GetUsername(db, userid)
+		if err != nil {
 			return posts, err
 		}
 
-		if postTags, err := getPostTags(db, post.ID); err == nil {
-			post.Tags = postTags
-		} else {
+		postTags, err := getPostTags(db, post.ID)
+		if err != nil {
 			return posts, err
 		}
 
-		// Check if post has any likes or dislikes
-		var res int
+		post.Username = username
+		post.Tags = postTags
 
-		if err := db.QueryRow("SELECT postid FROM postlikes WHERE postid = ?", post.ID).Scan(&res); err == nil {
-
-			q := "SELECT COUNT(like) FROM postlikes WHERE like = ? AND postid = ?"
-			var dislikeCount int
-
-			if err := db.QueryRow(q, 0, post.ID).Scan(&dislikeCount); err == nil {
-				post.DislikeCount = dislikeCount
-			} else if err != sql.ErrNoRows {
-				return posts, err
-			}
-
-			var likeCount int
-
-			if err := db.QueryRow(q, 1, post.ID).Scan(&likeCount); err == nil {
-				post.LikeCount = likeCount
-			} else if err != sql.ErrNoRows {
-				return posts, err
-			}
+		post, err = addLikesDislike(db, post)
+		if err != nil {
+			return posts, err
 		}
 
 		posts = append(posts, post)
@@ -106,11 +87,36 @@ func allPosts(db *sql.DB) ([]Post, error) {
 		return posts, err
 	}
 
-	fmt.Println(posts)
 	return posts, nil
 
 }
+func addLikesDislike(db *sql.DB, post Post) (Post, error) {
+	var res int
 
+	// Check if post has any likes or dislikes
+	if err := db.QueryRow("SELECT postid FROM postlikes WHERE postid = ?", post.ID).Scan(&res); err == nil {
+
+		q := "SELECT COUNT(like) FROM postlikes WHERE like = ? AND postid = ?"
+
+		var dislikeCount int
+		if err := db.QueryRow(q, 0, post.ID).Scan(&dislikeCount); err == nil {
+			post.DislikeCount = dislikeCount
+
+		} else if err != sql.ErrNoRows {
+			return post, err
+		}
+
+		var likeCount int
+		if err := db.QueryRow(q, 1, post.ID).Scan(&likeCount); err == nil {
+			post.LikeCount = likeCount
+
+		} else if err != sql.ErrNoRows {
+			return post, err
+		}
+	}
+
+	return post, nil
+}
 func getPostTags(db *sql.DB, postid int) ([]string, error) {
 	rows, err := db.Query("SELECT tagid FROM posttags WHERE postid = ?", postid)
 	if err != nil {

@@ -2,10 +2,8 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/internal/env"
 	"net/http"
-	"strconv"
 )
 
 func LikePost(env *env.Env) http.HandlerFunc {
@@ -34,13 +32,8 @@ func LikePost(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		isLike, err := strconv.Atoi(r.URL.Query().Get("isLike"))
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-
-		err = checkUserLikes(db, isLike, postid, userid)
+		// If user has previously reacted to post - updates the database else adds the disliked post to database
+		err = CheckUserLikes(db, postid, userid, 1)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -62,29 +55,27 @@ func LikePost(env *env.Env) http.HandlerFunc {
 3. If it founds user has not reacted
 	3.1 Add the postid, userid and like(0 if disliked, 1 if liked) to "postlikes" table
 */
-func checkUserLikes(db *sql.DB, isLike int, postid string, userid int) error {
+
+func CheckUserLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	// Query for which returns us whether user has liked or disliked that post
 	row := db.QueryRow("SELECT like FROM postlikes WHERE userid = ? AND postid = ?", userid, postid)
 
-	var like int
-	switch err := row.Scan(&like); err {
+	var temp int
+	switch err := row.Scan(&temp); err {
 
 	case sql.ErrNoRows: // If user doesnt have a like or dislike for that post
 		stmt, err := db.Prepare("INSERT INTO postlikes (userid, postid, like) VALUES (?, ?, ?)")
 		if err != nil {
 			return err
 		}
-		stmt.Exec(userid, postid, isLike)
+		stmt.Exec(userid, postid, 1)
 
 	case nil: // If user has liked or disliked the post, we check
-		if like != isLike {
-			stmt, err := db.Prepare("UPDATE postlikes SET like = ? WHERE userid = ?")
-			if err != nil {
-				return err
-			}
-			fmt.Println(err)
-			stmt.Exec(isLike, userid)
+		stmt, err := db.Prepare("UPDATE postlikes SET like = ? WHERE userid = ? AND postid = ?")
+		if err != nil {
+			return err
 		}
+		stmt.Exec(isLike, userid, postid)
 
 	default:
 		return err

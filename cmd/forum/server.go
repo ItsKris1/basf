@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/addcomment", handler.AddComment(env))
 
 	http.HandleFunc("/like", handler.LikePost(env))
+	http.HandleFunc("/dislike", handler.DislikePost(env))
 
 	http.HandleFunc("/register", auth.Register())
 	http.HandleFunc("/registerauth", auth.RegisterAuth(env))
