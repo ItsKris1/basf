@@ -29,7 +29,8 @@
             <br>
             <small class="text-muted">Topic started: {{$post.CreationDate}}</small>
 
-            <a class="btn btn-primary" href="/likepost?post={{ $post.ID }}" role="button">Like</a>
+            <a class="btn btn-primary" href="/like?isLike=1&post={{ $post.ID }}" role="button">Like</a>
+            <a class="btn btn-primary" href="/like?isLike=0&post={{ $post.ID }}" role="button">Dislike</a>
         </div>
     </div>
 

@@ -2,8 +2,10 @@ package handler
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/env"
 	"net/http"
+	"strconv"
 )
 
 func LikePost(env *env.Env) http.HandlerFunc {
@@ -32,8 +34,48 @@ func LikePost(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		stmt, err := db.Prepare("INSERT OR IGNORE INTO postlikes (postid, userid) VALUES (?, ?)")
-		stmt.Exec(postid, userid)
+		isLike, err := strconv.Atoi(r.URL.Query().Get("isLike"))
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		fmt.Println(postid)
+		fmt.Println(isLike)
+		// Check if user has liked or disliked
+		// SELECT like FROM postlikes WHERE userid = ?
+		// If like != islike
+		// update..
+
+		row := db.QueryRow("SELECT like FROM postlikes WHERE userid = ? AND postid = ?", userid, postid)
+
+		var like int
+		switch err := row.Scan(&like); err {
+
+		case sql.ErrNoRows:
+			fmt.Println("Here")
+			stmt, err := db.Prepare("INSERT INTO postlikes (userid, postid, like) VALUES (?, ?, ?)")
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
+			stmt.Exec(userid, postid, isLike)
+
+		case nil:
+			if like != isLike {
+				stmt, err := db.Prepare("UPDATE postlikes SET like = ? WHERE userid = ?")
+				if err != nil {
+					http.Error(w, err.Error(), 500)
+					return
+				}
+				fmt.Println(err)
+				stmt.Exec(isLike, userid)
+			}
+
+		default:
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 	}
 }
