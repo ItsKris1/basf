@@ -20,7 +20,13 @@
             <p class="card-text "><a href="/post?id={{$post.ID}}" class="text-dark">{{$post.Title}}</a>
             </p>
 
-
+            
+            <small class="text-muted">Tags: 
+                {{ range $post.Tags}}
+                {{.}}
+                {{end}}
+            </small>
+            <br>
             <small class="text-muted">Topic started: {{$post.CreationDate}}</small>
         </div>
     </div>

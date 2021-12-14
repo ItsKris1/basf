@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/internal/env"
 	"forum/internal/session"
 	"forum/internal/tpl"
@@ -43,12 +42,10 @@ func Index(env *env.Env) http.HandlerFunc {
 	}
 }
 
-}
 func allPosts(db *sql.DB) ([]Post, error) {
 
 	rows, err := db.Query("SELECT * FROM posts")
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -63,10 +60,17 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
-		if username, err := GetUsername(db, userid); err != nil {
-			return posts, err
-		} else {
+		if username, err := GetUsername(db, userid); err == nil {
 			post.Username = username
+
+		} else {
+			return posts, err
+		}
+
+		if postTags, err := getPostTags(db, post.ID); err == nil {
+			post.Tags = postTags
+		} else {
+			return posts, err
 		}
 
 		posts = append(posts, post)
@@ -79,11 +83,49 @@ func allPosts(db *sql.DB) ([]Post, error) {
 	return posts, nil
 }
 
-func GetUsername(db *sql.DB, userid int) (string, error) {
-	row := db.QueryRow("SELECT username FROM users WHERE id = ?", userid)
+func getPostTags(db *sql.DB, postid int) ([]string, error) {
+	rows, err := db.Query("SELECT tagid FROM posttags WHERE postid = ?", postid)
+	if err != nil {
+		return nil, err
+	}
 
+	var postTags []string
+	for rows.Next() {
+		var tagid string
+
+		if err := rows.Scan(&tagid); err != nil {
+			return postTags, err
+		}
+
+		tagname, err := getTagName(db, tagid)
+		if err != nil {
+			return postTags, err
+		}
+
+		postTags = append(postTags, tagname)
+	}
+
+	if err := rows.Err(); err != nil {
+		return postTags, err
+	}
+
+	return postTags, err
+}
+
+func getTagName(db *sql.DB, tagid string) (string, error) {
+	var tagname string
+
+	if err := db.QueryRow("SELECT name FROM tags WHERE id = ?", tagid).Scan(&tagname); err != nil {
+		return "", err
+	}
+
+	return tagname, nil
+
+}
+
+func GetUsername(db *sql.DB, userid int) (string, error) {
 	var username string
-	if err := row.Scan(&username); err != nil {
+	if err := db.QueryRow("SELECT username FROM users WHERE id = ?", userid).Scan(&username); err != nil {
 		return "", err
 	}
 
