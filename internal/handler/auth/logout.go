@@ -13,6 +13,7 @@ func Logout(env *env.Env) http.HandlerFunc {
 
 		cookie, err := r.Cookie("session")
 		if err != nil { // If there is no cookie we dont have to do anyhing
+			http.Redirect(w, r, "/", 302)
 			return
 		}
 

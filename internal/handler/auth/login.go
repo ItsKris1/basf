@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"forum/internal/env"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -11,8 +12,9 @@ type LoginPage struct {
 	LoginMsgs LoginMessages
 }
 
-func Login() http.HandlerFunc {
+func Login(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		session.Check(env.DB, w, r)
 		loginPage := LoginPage{
 			UserInfo:  session.UserInfo,
 			LoginMsgs: LoginMsgs,

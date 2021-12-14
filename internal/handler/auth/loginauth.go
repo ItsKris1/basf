@@ -45,9 +45,11 @@ func LoginAuth(env *env.Env) http.HandlerFunc {
 
 			session.Create(userid, w, r, db) // creates cookie for the user and adds the information to database
 			http.Redirect(w, r, "/", 302)
+			return
 
 		} else {
 			http.Redirect(w, r, "/login", 302)
+			return
 		}
 
 	}

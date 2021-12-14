@@ -2,6 +2,7 @@ package session
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -19,7 +20,7 @@ func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	// If cookie is not found, session has expired
 	if err != nil {
-		UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
+		fmt.Println("Cookie not found lmao lool")
 
 		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?") // delete the expired session from db
 		if err == nil {
@@ -37,6 +38,7 @@ func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		if err := row.Scan(&UserInfo.ID); err == sql.ErrNoRows { // If it wont find who the cookie belongs to - it deletes it
 			cookie.Expires = time.Unix(0, 0)
 			http.SetCookie(w, cookie)
+			UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
 			return
 
 		} else if err != nil {

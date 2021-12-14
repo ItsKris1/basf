@@ -28,7 +28,7 @@ func main() {
 
 	http.HandleFunc("/register", auth.Register())
 	http.HandleFunc("/registerauth", auth.RegisterAuth(env))
-	http.HandleFunc("/login", auth.Login())
+	http.HandleFunc("/login", auth.Login(env))
 	http.HandleFunc("/loginauth", auth.LoginAuth(env))
 	http.HandleFunc("/logout", auth.Logout(env))
 
