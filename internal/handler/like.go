@@ -2,8 +2,8 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/internal/env"
+	"forum/internal/handler/auth"
 	"net/http"
 )
 
@@ -12,13 +12,15 @@ func Like(env *env.Env) http.HandlerFunc {
 		db := env.DB
 		cookie, err := r.Cookie("session")
 		if err != nil { // Cookie was not found
-			http.Error(w, err.Error(), 401) // 401 unauthorized access
+			auth.LoginMsgs.LoginRequired = true // LoginMsgs is defined in auth/loginauth.go
+			http.Redirect(w, r, "/login", 301)
 			return
 		}
 
-		userid, err := GetUserID(db, cookie.Value) // comment.go
-		if err == sql.ErrNoRows {                  // If an ongoing session was not found
-			http.Error(w, err.Error(), 401) // 401 unauthorized access
+		userid, err := GetUserID(db, cookie.Value) // GetUserID is in comment.go
+		if err == sql.ErrNoRows {
+			auth.LoginMsgs.LoginRequired = true
+			http.Redirect(w, r, "/login", 301)
 			return
 
 		} else if err != nil {
@@ -26,22 +28,30 @@ func Like(env *env.Env) http.HandlerFunc {
 			return
 		}
 
+		// If the URL query value of "post" is empty - it means we liked a comment
 		if r.URL.Query().Get("post") == "" {
-			commentid := r.URL.Query().Get("comment")
+			id := r.URL.Query().Get("comment")
+			commentid, err := CheckURLQuery(db, id)
+			if err != nil {
+				http.Error(w, err.Error(), 400)
+				return
+			}
 
 			err = CheckCommentLikes(db, userid, commentid, 1)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			}
+
+			// If the URL query value of "post" was not empty - means we liked a post
 		} else {
-			postid := r.URL.Query().Get("post")
+			id := r.URL.Query().Get("post")
+			postid, err := CheckURLQuery(db, id)
 			if err != nil {
 				http.Error(w, err.Error(), 400)
 				return
 			}
 
-			// If user has previously reacted to post - updates the database else adds the disliked post to database
 			err = CheckPostLikes(db, postid, userid, 1)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
@@ -50,7 +60,7 @@ func Like(env *env.Env) http.HandlerFunc {
 		}
 
 		http.Redirect(w, r, "/", 302)
-
+		return
 	}
 }
 
@@ -64,7 +74,6 @@ func Like(env *env.Env) http.HandlerFunc {
 3. If it founds user has not reacted
 	3.1 Add the postid, userid and like(0 if disliked, 1 if liked) to "postlikes" table
 */
-
 func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	// Query for which returns us whether user has liked or disliked that post
 	row := db.QueryRow("SELECT like FROM postlikes WHERE userid = ? AND postid = ?", userid, postid)
@@ -72,9 +81,9 @@ func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	var likeVal int
 	switch err := row.Scan(&likeVal); err {
 
-	case sql.ErrNoRows: // If user doesnt have a like or dislike for that post
+	// If user doesnt have a like or dislike for that post we add data to the postlikes
+	case sql.ErrNoRows:
 
-		fmt.Println("No rows")
 		stmt, err := db.Prepare("INSERT INTO postlikes (userid, postid, like) VALUES (?, ?, ?)")
 		if err != nil {
 			return err
@@ -82,13 +91,13 @@ func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 		stmt.Exec(userid, postid, isLike)
 
 	case nil:
-		if likeVal == isLike {
+		if likeVal == isLike { // If user liked already liked post or vice-versa
 			stmt, err := db.Prepare("DELETE FROM postlikes WHERE postid = ? AND userid = ?")
 			if err != nil {
 				return err
 			}
 			stmt.Exec(postid, userid)
-		} else {
+		} else { // If user previously liked and now disliked or vice-versa
 			stmt, err := db.Prepare("UPDATE postlikes SET like = ? WHERE userid = ? AND postid = ?")
 			if err != nil {
 				return err
@@ -96,22 +105,22 @@ func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 			stmt.Exec(isLike, userid, postid)
 		}
 
+	// If something unexpected happened (an error)
 	default:
-		fmt.Println("Something else")
 		return err
 	}
 
 	return nil
 }
 
+/* CheckCommentLikes works the same way as CheckPostLikes just with comments */
 func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
 	row := db.QueryRow("SELECT like FROM commentlikes WHERE userid = ? AND commentid = ?", userid, commentid)
 
-	var temp int
-	switch err := row.Scan(&temp); err {
+	var likeVal int
+	switch err := row.Scan(&likeVal); err {
 
-	case sql.ErrNoRows: // If user doesnt have a like or dislike for that post
-
+	case sql.ErrNoRows:
 		stmt, err := db.Prepare("INSERT INTO commentlikes (commentid, userid, like) VALUES (?, ?, ?)")
 		if err != nil {
 			return err
@@ -119,7 +128,6 @@ func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) err
 		stmt.Exec(commentid, userid, isLike)
 
 	case nil:
-		fmt.Println("Nil")
 		stmt, err := db.Prepare("UPDATE commentlikes SET like = ? WHERE userid = ? AND commentid = ?")
 		if err != nil {
 			return err
@@ -127,7 +135,6 @@ func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) err
 		stmt.Exec(isLike, userid, commentid)
 
 	default:
-		fmt.Println("Something else")
 		return err
 	}
 
