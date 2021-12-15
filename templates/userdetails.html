@@ -1,0 +1,18 @@
+{{ template "base" .}}
+{{ define "content" }}
+
+<h1>Liked posts</h1>
+{{ range .LikedPosts}}
+<p>{{ .Title}}</p>
+<p>{{ .Body}}</p>
+<p>{{ .CreationDate}}</p>
+{{ end}}
+
+
+<h1>Created posts</h1>
+{{ range .CreatedPosts }}
+<p>{{ .Title}}</p>
+<p>{{ .Body}}</p>
+<p>{{ .CreationDate}}</p>
+{{ end }}
+{{end}}

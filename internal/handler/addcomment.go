@@ -26,7 +26,7 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		db := env.DB                    // intializes db connection
 
 		// CheckQuery checks if the id from URL is valid and exists
-		postid, err := CheckURLPostID(db, id)
+		postid, err := CheckURLQuery(db, id)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
@@ -72,7 +72,7 @@ func GetUserID(db *sql.DB, cookieVal string) (int, error) {
 }
 
 // Checks the URL query by checking if its values can be converted to an integer and if it exists in database
-func CheckURLPostID(db *sql.DB, value string) (string, error) {
+func CheckURLQuery(db *sql.DB, value string) (string, error) {
 	if _, err := strconv.Atoi(value); err != nil {
 		return "", err
 	}

@@ -33,6 +33,7 @@ func main() {
 	http.HandleFunc("/loginauth", auth.LoginAuth(env))
 	http.HandleFunc("/logout", auth.Logout(env))
 
+	http.HandleFunc("/user", handler.UserDetails(env))
 	fs := http.FileServer(http.Dir("./assets"))
 	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
 

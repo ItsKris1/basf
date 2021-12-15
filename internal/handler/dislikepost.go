@@ -26,7 +26,7 @@ func DislikePost(env *env.Env) http.HandlerFunc {
 		}
 
 		id := r.URL.Query().Get("post")
-		postid, err := CheckURLPostID(db, id)
+		postid, err := CheckURLQuery(db, id)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
