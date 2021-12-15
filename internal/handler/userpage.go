@@ -6,6 +6,7 @@ import (
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
+	"strconv"
 )
 
 type UserPage struct {
@@ -23,21 +24,25 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 
 		db := env.DB
 
-		id := r.URL.Query().Get("id")
-		userid, err := CheckURLQuery(db, id)
-		if err != nil {
+		userid := r.URL.Query().Get("id")
+		if _, err := strconv.Atoi(userid); err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
 
+		if err := db.QueryRow("SELECT id FROM users WHERE id = ?", userid).Scan(&userid); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
 		likedPosts, err := userLikedPosts(db, userid)
-		if err != nil {
+		if err != nil && err != sql.ErrNoRows {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
 		createdPosts, err := userCreatedPosts(db, userid)
-		if err != nil {
+		if err != nil && err != sql.ErrNoRows {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -65,6 +70,11 @@ func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
 		var likedPost Post
 
 		if err := rows.Scan(&postid); err != nil {
+			return likedPosts, err
+		}
+
+		var userid int
+		if err := db.QueryRow("SELECT userid FROM posts WHERE postid = ?", postid).Scan(&userid); err != nil {
 			return likedPosts, err
 		}
 

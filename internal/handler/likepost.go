@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/env"
 	"net/http"
 )
@@ -40,7 +41,6 @@ func LikePost(env *env.Env) http.HandlerFunc {
 		}
 
 		http.Redirect(w, r, "/", 302)
-		return
 
 	}
 }
@@ -64,13 +64,16 @@ func CheckUserLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	switch err := row.Scan(&temp); err {
 
 	case sql.ErrNoRows: // If user doesnt have a like or dislike for that post
+
+		fmt.Println("No rows")
 		stmt, err := db.Prepare("INSERT INTO postlikes (userid, postid, like) VALUES (?, ?, ?)")
 		if err != nil {
 			return err
 		}
 		stmt.Exec(userid, postid, 1)
 
-	case nil: // If user has liked or disliked the post, we check
+	case nil:
+		fmt.Println("Nil")
 		stmt, err := db.Prepare("UPDATE postlikes SET like = ? WHERE userid = ? AND postid = ?")
 		if err != nil {
 			return err
@@ -78,6 +81,7 @@ func CheckUserLikes(db *sql.DB, postid string, userid int, isLike int) error {
 		stmt.Exec(isLike, userid, postid)
 
 	default:
+		fmt.Println("Something else")
 		return err
 	}
 
