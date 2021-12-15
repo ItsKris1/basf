@@ -18,6 +18,10 @@
                     <h5 class="card-title">{{.Post.Title}}</h5>
                     <p class="card-text">{{.Post.Body}}</p>
                     <p class="card-text"><small class="text-muted">Created: {{ .Post.CreationDate}}</small></p>
+
+                    {{ .Post.LikeCount}}
+                    {{ .Post.DislikeCount}}
+
                 </div>
             </div>
         </div>
@@ -37,10 +41,16 @@
 
                     <p class="card-text">{{.Body}}</p>
                     <p class="card-text"><small class="text-muted">Created: {{.CreationDate}}</small></p>
+                    <a class="btn btn-primary" href="/like?comment={{ .ID }}" role="button" style="width: 100px"> <span>{{.Likes}}</span> Like</a>
+                    <a class="btn btn-primary" href="/dislike?comment={{ .ID }}" role="button" style="width: 100px"><span>{{.Dislikes}}</span> Dislike</a>
                 </div>
             </div>
         </div>
-    </div> {{ end }}
+       
+    </div> 
+
+    
+    {{ end }}
 
 
 

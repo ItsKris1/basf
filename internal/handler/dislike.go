@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func DislikePost(env *env.Env) http.HandlerFunc {
+func Dislike(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		db := env.DB
 		cookie, err := r.Cookie("session")
@@ -25,18 +25,27 @@ func DislikePost(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		id := r.URL.Query().Get("post")
-		postid, err := CheckURLQuery(db, id)
-		if err != nil {
-			http.Error(w, err.Error(), 400)
-			return
-		}
+		if r.URL.Query().Get("post") == "" {
+			commentid := r.URL.Query().Get("comment")
 
-		// If user has previously reacted to post - updates the database else adds the disliked post to database
-		err = CheckUserLikes(db, postid, userid, 0) // the function is in likepost.go
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
+			err = CheckCommentLikes(db, userid, commentid, 0)
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
+		} else {
+			postid := r.URL.Query().Get("post")
+			if err != nil {
+				http.Error(w, err.Error(), 400)
+				return
+			}
+
+			// If user has previously reacted to post - updates the database else adds the disliked post to database
+			err = CheckPostLikes(db, postid, userid, 0)
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
 		}
 
 		http.Redirect(w, r, "/", 302)

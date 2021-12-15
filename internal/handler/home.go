@@ -75,7 +75,7 @@ func allPosts(db *sql.DB) ([]Post, error) {
 		post.Username = username
 		post.Tags = postTags
 
-		post, err = addLikesDislike(db, post)
+		post, err = AddLikesDislike(db, post)
 		if err != nil {
 			return posts, err
 		}
@@ -90,7 +90,7 @@ func allPosts(db *sql.DB) ([]Post, error) {
 	return posts, nil
 
 }
-func addLikesDislike(db *sql.DB, post Post) (Post, error) {
+func AddLikesDislike(db *sql.DB, post Post) (Post, error) {
 	var res int
 
 	// Check if post has any likes or dislikes

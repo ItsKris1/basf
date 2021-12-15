@@ -9,11 +9,14 @@ import (
 )
 
 type Comment struct {
+	ID           string
 	Body         string
 	PostID       int
 	UserID       int
 	Username     string
 	CreationDate string
+	Likes        string
+	Dislikes     string
 }
 
 type ViewPostPage struct {
@@ -40,6 +43,12 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 			http.Error(w, err.Error(), 400)
 			return
 		}
+		var err error
+		viewPostPage.Post, err = AddLikesDislike(db, viewPostPage.Post)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 		// Get the post username by userid
 		viewPostPage.Post.Username, _ = GetUsername(db, userid)
@@ -60,7 +69,7 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 
 func postComments(db *sql.DB, postid string) ([]Comment, error) {
 
-	rows, err := db.Query("SELECT body, postid, userid, creation_date FROM comments where postid = ?", postid)
+	rows, err := db.Query("SELECT id, body, postid, userid, creation_date FROM comments where postid = ?", postid)
 	if err != nil {
 		return nil, err
 	}
@@ -70,16 +79,20 @@ func postComments(db *sql.DB, postid string) ([]Comment, error) {
 	var comments []Comment
 	for rows.Next() {
 		var comment Comment
-		var userid int
 
-		if err := rows.Scan(&comment.Body, &comment.PostID, &userid, &comment.CreationDate); err != nil {
+		if err := rows.Scan(&comment.ID, &comment.Body, &comment.PostID, &comment.UserID, &comment.CreationDate); err != nil {
 			return comments, err
 		}
 
-		if username, err := GetUsername(db, userid); err != nil { // GetUsername is from index.go
+		if username, err := GetUsername(db, comment.UserID); err != nil { // GetUsername is from index.go
 			return comments, err
 		} else {
 			comment.Username = username
+		}
+
+		comment, err = addCommentLikes(db, comment)
+		if err != nil {
+			return comments, err
 		}
 
 		comments = append(comments, comment)
@@ -90,4 +103,32 @@ func postComments(db *sql.DB, postid string) ([]Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func addCommentLikes(db *sql.DB, comment Comment) (Comment, error) {
+	var res int
+
+	// Check if post has any likes or dislikes
+	if err := db.QueryRow("SELECT commentid FROM commentlikes WHERE commentid = ?", comment.ID).Scan(&res); err == nil {
+
+		q := "SELECT COUNT(like) FROM commentlikes WHERE like = ? AND commentid = ?"
+
+		var dislikes string
+		if err := db.QueryRow(q, 0, comment.ID).Scan(&dislikes); err == nil {
+			comment.Dislikes = dislikes
+
+		} else if err != sql.ErrNoRows {
+			return comment, err
+		}
+
+		var likes string
+		if err := db.QueryRow(q, 1, comment.ID).Scan(&likes); err == nil {
+			comment.Likes = likes
+
+		} else if err != sql.ErrNoRows {
+			return comment, err
+		}
+	}
+
+	return comment, nil
 }
