@@ -20,7 +20,7 @@ func Login(env *env.Env) http.HandlerFunc {
 			LoginMsgs: LoginMsgs,
 		}
 
-		tpl.RenderTemplates(w, "login.html", loginPage, "./templates/login.html", "./templates/base.html")
+		tpl.RenderTemplates(w, "login.html", loginPage, "./templates/auth/login.html", "./templates/base.html")
 
 		LoginMsgs = LoginMessages{} // Reset the login messages or they wont change upon reloading the
 

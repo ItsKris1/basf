@@ -18,7 +18,7 @@ func Register() http.HandlerFunc {
 			UserInfo: session.UserInfo,
 		}
 
-		tpl.RenderTemplates(w, "register.html", registerPage, "./templates/register.html", "./templates/base.html")
+		tpl.RenderTemplates(w, "register.html", registerPage, "./templates/auth/register.html", "./templates/base.html")
 
 		RegMsgs = RegisterMessages{} // Reset the login messages or they wont change upon reloading the page
 	}

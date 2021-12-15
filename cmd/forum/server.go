@@ -19,7 +19,7 @@ func main() {
 	// Makes an environment for Database connection
 	env := &env.Env{DB: db}
 
-	http.HandleFunc("/", handler.Index(env))
+	http.HandleFunc("/", handler.Home(env))
 	http.HandleFunc("/createpost", handler.CreatePost(env))
 	http.HandleFunc("/post", handler.ViewPost(env))
 	http.HandleFunc("/addcomment", handler.AddComment(env))

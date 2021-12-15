@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"fmt"
+	"database/sql"
 	"forum/internal/env"
 	"forum/internal/session"
 	"forum/internal/tpl"
@@ -16,43 +16,30 @@ type UserPage struct {
 
 func UserDetails(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "Only GET request allowed", 400)
+			return
+		}
+
 		db := env.DB
 
-		// Liked posts
 		id := r.URL.Query().Get("id")
 		userid, err := CheckURLQuery(db, id)
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+
+		likedPosts, err := userLikedPosts(db, userid)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		rows, err := db.Query("SELECT postid FROM postlikes WHERE userid = ? AND like = 1", userid)
-
-		var likedPosts []Post
-		for rows.Next() {
-			var postid int
-			var userPost Post
-			if err := rows.Scan(&postid); err != nil {
-				fmt.Println(err)
-			}
-
-			if err := db.QueryRow("SELECT userid, title, body, creation_date FROM posts WHERE postid = ? AND userid = ?", postid, userid).Scan(&userPost.ID, &userPost.Title, &userPost.Body, &userPost.CreationDate); err != nil {
-				fmt.Println(err)
-			}
-
-			likedPosts = append(likedPosts, userPost)
-		}
-
-		rows, err = db.Query("SELECT userid, title, body, creation_date FROM posts WHERE userid = ?", userid)
-		var createdPosts []Post
-		for rows.Next() {
-			var createdPost Post
-
-			if err := db.QueryRow("SELECT userid, title, body, creation_date FROM posts WHERE userid = ?", userid).Scan(&createdPost.ID, &createdPost.Title, &createdPost.Body, &createdPost.CreationDate); err != nil {
-				fmt.Println(err)
-			}
-
-			createdPosts = append(likedPosts, createdPost)
+		createdPosts, err := userCreatedPosts(db, userid)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
 		}
 
 		userPage := UserPage{
@@ -63,4 +50,61 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 
 		tpl.RenderTemplates(w, "userdetails.html", userPage, "./templates/base.html", "./templates/userdetails.html")
 	}
+}
+
+func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
+	rows, err := db.Query("SELECT postid FROM postlikes WHERE userid = ? AND like = 1", userid)
+	if err != nil {
+		return nil, err
+	}
+
+	var likedPosts []Post
+
+	for rows.Next() {
+		var postid int
+		var likedPost Post
+
+		if err := rows.Scan(&postid); err != nil {
+			return likedPosts, err
+		}
+
+		row := db.QueryRow("SELECT userid, title, body, creation_date FROM posts WHERE postid = ? AND userid = ?", postid, userid)
+		if err := row.Scan(&likedPost.ID, &likedPost.Title, &likedPost.Body, &likedPost.CreationDate); err != nil {
+			return likedPosts, err
+		}
+
+		likedPosts = append(likedPosts, likedPost)
+	}
+
+	if err := rows.Err(); err != nil {
+		return likedPosts, err
+	}
+
+	return likedPosts, nil
+}
+
+func userCreatedPosts(db *sql.DB, userid string) ([]Post, error) {
+	rows, err := db.Query("SELECT userid, title, body, creation_date FROM posts WHERE userid = ?", userid)
+	if err != nil {
+		return nil, err
+	}
+
+	var createdPosts []Post
+
+	for rows.Next() {
+
+		var createdPost Post
+		if err := rows.Scan(&createdPost.ID, &createdPost.Title, &createdPost.Body, &createdPost.CreationDate); err != nil {
+			return createdPosts, err
+		}
+
+		createdPosts = append(createdPosts, createdPost)
+	}
+
+	if err := rows.Err(); err != nil {
+		return createdPosts, err
+	}
+
+	return createdPosts, nil
+
 }

@@ -19,27 +19,27 @@ type Post struct {
 	DislikeCount int
 }
 
-type IndexPage struct {
+type HomePage struct {
 	UserInfo session.User
 	AllPosts []Post
 }
 
-func Index(env *env.Env) http.HandlerFunc {
+func Home(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session.Check(env.DB, w, r) // Every time the user goes to home page it checks if he is logged in
 
-		indexPage := IndexPage{
+		homePage := HomePage{
 			UserInfo: session.UserInfo, // We need UserInfo for "base.html" template
 		}
 
 		if posts, err := allPosts(env.DB); err == nil { // If err is nil, we know we got all the posts
-			indexPage.AllPosts = posts
+			homePage.AllPosts = posts
 		} else {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		tpl.RenderTemplates(w, "index.html", indexPage, "./templates/base.html", "./templates/index.html")
+		tpl.RenderTemplates(w, "home.html", homePage, "./templates/base.html", "./templates/home.html")
 
 	}
 }
