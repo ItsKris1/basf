@@ -3,6 +3,8 @@
 <h2>Login</h2>
 {{ if .LoginMsgs.SuccesfulRegister}}
 <h3>Registration was succesful!</h3>
+{{ else if .LoginMsgs.LoginRequired}}
+<h3>Please log in to continue!</h3>
 {{ end }}
 <form action="/loginauth" method="post">
     <!-- This form sends the entered data to loginauth, which will authenticate -->

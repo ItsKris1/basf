@@ -2,7 +2,6 @@ package session
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -14,44 +13,45 @@ type User struct {
 
 var UserInfo User
 
-func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) {
-
+func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) (bool, error) {
 	cookie, err := r.Cookie("session")
 
-	// If cookie is not found, session has expired
 	if err != nil {
-		fmt.Println("Cookie not found lmao lool")
-		UserInfo.ID = 0                                                  // Resets the UserID if there is no ongoing session
-		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?") // delete the expired session from db
-		if err == nil {
-			stmt.Exec(UserInfo.ID)
-
-		} else if err != sql.ErrNoRows { // If the error is not ErrNoRows, something unexpected happened
-			http.Error(w, err.Error(), 500)
-			return
+		// delete the expired session from db
+		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?")
+		if err != nil {
+			if err != sql.ErrNoRows {
+				return false, err
+			}
 		}
+		stmt.Exec(UserInfo.ID)
+		UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
+
+		return false, err
 
 	} else {
+		// Check if that cookie belongs to user
 		row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
 
-		// Get the logged in user's UserID
-		if err := row.Scan(&UserInfo.ID); err == sql.ErrNoRows { // If it wont find who the cookie belongs to - it deletes it
-			cookie.Expires = time.Unix(0, 0)
-			http.SetCookie(w, cookie)
-			UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
-			return
+		if err := row.Scan(&UserInfo.ID); err != nil { // If it wont find who the cookie belongs to - it deletes it
+			if err == sql.ErrNoRows {
+				cookie.Expires = time.Unix(0, 0)
+				http.SetCookie(w, cookie)
 
-		} else if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
+				UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
+				return false, err
+			}
+
+			return false, err
 		}
 
 		// Get the logged in user's Username
 		row = db.QueryRow("SELECT username FROM users WHERE id = ?", UserInfo.ID)
-		if err := row.Scan(&UserInfo.Username); err != nil {
-			http.Error(w, err.Error(), 500)
-			return
 
+		if err := row.Scan(&UserInfo.Username); err != nil {
+			return false, err
 		}
+
+		return true, nil
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/env"
+	"forum/internal/handler/auth"
+	"forum/internal/session"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,6 +13,22 @@ import (
 
 func AddComment(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		db := env.DB
+		isLogged, err := session.Check(db, w, r)
+
+		// If an actual error happened in session.Check
+		if err != nil && err != sql.ErrNoRows {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		// If user not logged
+		if !isLogged {
+			http.Redirect(w, r, "/login", 302)
+			auth.LoginMsgs.LoginRequired = true
+			return
+		}
 
 		if r.Method != "POST" {
 			http.Error(w, "Only POST request allowed", 400)
@@ -23,7 +41,7 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		}
 
 		id := r.URL.Query().Get("post") // id is the ID of the post, which we get from URL
-		db := env.DB                    // intializes db connection
+		// intializes db connection
 
 		// CheckQuery checks if the id from URL is valid and exists
 		postid, err := CheckURLQuery(db, id)
@@ -34,8 +52,7 @@ func AddComment(env *env.Env) http.HandlerFunc {
 
 		cookie, err := r.Cookie("session")
 		if err != nil { // If there is no active cookie we redirect the user to home page
-			fmt.Println("You are not logged in!")
-			http.Redirect(w, r, "/", 302)
+			http.Error(w, err.Error(), 500)
 			return
 		}
 

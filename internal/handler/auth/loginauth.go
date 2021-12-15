@@ -13,6 +13,7 @@ type LoginMessages struct {
 	NotFound          bool
 	WrongPassword     bool
 	SuccesfulRegister bool // Displays message on login screen after succesful registration
+	LoginRequired     bool
 }
 
 var LoginMsgs LoginMessages

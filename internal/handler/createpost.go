@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
+	"forum/internal/handler/auth"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -21,14 +22,14 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 			UserInfo: session.UserInfo,
 		}
 
+		db := env.DB // intializes db connection
+
 		if r.Method == "POST" {
 
 			if err := r.ParseForm(); err != nil {
 				http.Error(w, err.Error(), 400)
 				return
 			}
-
-			db := env.DB // intializes db connection
 
 			// Add data to Posts table
 			if err := addPosts(db, r); err != nil {
@@ -50,17 +51,30 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 
 			http.Redirect(w, r, "/", 302)
 			return
-		} else {
 
-			db := env.DB
-			if allTags, err := getAllTags(db); err == nil {
-				createPostPage.Tags = allTags
-			} else {
+		} else { // If the method is GET
+			isLogged, err := session.Check(db, w, r)
+
+			if err != nil && err != sql.ErrNoRows {
 				http.Error(w, err.Error(), 500)
 				return
 			}
 
+			if !isLogged {
+				http.Redirect(w, r, "/login", 302)
+				auth.LoginMsgs.LoginRequired = true
+				return
+			}
+			// allTags is for displaying all the possible tags while creating the post
+			allTags, err := getAllTags(db)
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
+			createPostPage.Tags = allTags
+
 			tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/posts/createpost.html", "./templates/base.html")
+
 		}
 
 	}
