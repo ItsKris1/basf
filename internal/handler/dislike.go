@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
 	"net/http"
@@ -59,7 +58,6 @@ func Dislike(env *env.Env) http.HandlerFunc {
 			return
 
 		} else if postid != "" {
-			fmt.Println("postid")
 			// CheckQuery checks if the id from URL is valid and exists
 			if err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
 				http.Error(w, err.Error(), 400)

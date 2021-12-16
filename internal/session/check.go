@@ -38,8 +38,8 @@ func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) (bool, error) {
 				cookie.Expires = time.Unix(0, 0)
 				http.SetCookie(w, cookie)
 
-				UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
-				return false, err
+				UserInfo.ID = 0   // Resets the UserID if there is no ongoing session
+				return false, nil // Return nil because the error is handled
 			}
 
 			return false, err

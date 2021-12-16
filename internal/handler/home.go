@@ -26,7 +26,10 @@ type HomePage struct {
 
 func Home(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		if r.URL.Path != "/" {
+			http.Error(w, "Page not found", 404)
+			return
+		}
 		// Every time the user goes to home page it checks if he is logged in
 		if _, err := session.Check(env.DB, w, r); err != nil {
 			http.Error(w, err.Error(), 500)
