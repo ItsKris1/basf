@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
 	"net/http"
@@ -28,25 +29,27 @@ func Like(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		// If the URL query value of "post" is empty - it means we liked a comment
-		if r.URL.Query().Get("post") == "" {
-			id := r.URL.Query().Get("comment")
-			commentid, err := CheckURLQuery(db, id)
+		/*
+			Liking or disliking a post will put the post id to url
+			Liking or disliking a comment will put the comment id to url
+		*/
+		commentid := r.URL.Query().Get("comment")
+		postid := r.URL.Query().Get("post")
+
+		if commentid != "" {
+			commentid, err := CheckURLQuery(db, "SELECT commentid FROM commentlikes WHERE commentid = ?", commentid) // CheckQuery checks if the id from URL is valid and exists
 			if err != nil {
 				http.Error(w, err.Error(), 400)
 				return
 			}
-
 			err = CheckCommentLikes(db, userid, commentid, 1)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			}
 
-			// If the URL query value of "post" was not empty - means we liked a post
-		} else {
-			id := r.URL.Query().Get("post")
-			postid, err := CheckURLQuery(db, id)
+		} else if postid != "" {
+			postid, err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid) // CheckQuery checks if the id from URL is valid and exists
 			if err != nil {
 				http.Error(w, err.Error(), 400)
 				return
@@ -74,7 +77,7 @@ func Like(env *env.Env) http.HandlerFunc {
 3. If it founds user has not reacted
 	3.1 Add the postid, userid and like(0 if disliked, 1 if liked) to "postlikes" table
 */
-func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
+func CheckPostLikes(db *sql.DB, postid int, userid int, isLike int) error {
 	// Query for which returns us whether user has liked or disliked that post
 	row := db.QueryRow("SELECT like FROM postlikes WHERE userid = ? AND postid = ?", userid, postid)
 
@@ -113,26 +116,36 @@ func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	return nil
 }
 
-/* CheckCommentLikes works the same way as CheckPostLikes just with comments */
-func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
+/* CheckCommentLikes works the same way as function CheckPostLikes(line 77) just with comments */
+func CheckCommentLikes(db *sql.DB, userid int, commentid int, isLike int) error {
 	row := db.QueryRow("SELECT like FROM commentlikes WHERE userid = ? AND commentid = ?", userid, commentid)
 
 	var likeVal int
 	switch err := row.Scan(&likeVal); err {
 
 	case sql.ErrNoRows:
+		fmt.Println("Hello")
 		stmt, err := db.Prepare("INSERT INTO commentlikes (commentid, userid, like) VALUES (?, ?, ?)")
 		if err != nil {
+			fmt.Println("err != nil")
 			return err
 		}
 		stmt.Exec(commentid, userid, isLike)
 
 	case nil:
-		stmt, err := db.Prepare("UPDATE commentlikes SET like = ? WHERE userid = ? AND commentid = ?")
-		if err != nil {
-			return err
+		if likeVal == isLike { // If user liked already liked post or vice-versa
+			stmt, err := db.Prepare("DELETE FROM commentlikes WHERE commentid = ? AND userid = ?")
+			if err != nil {
+				return err
+			}
+			stmt.Exec(commentid, userid)
+		} else { // If user previously liked and now disliked or vice-versa
+			stmt, err := db.Prepare("UPDATE commentlikes SET like = ? WHERE userid = ? AND commentid = ?")
+			if err != nil {
+				return err
+			}
+			stmt.Exec(isLike, userid, commentid)
 		}
-		stmt.Exec(isLike, userid, commentid)
 
 	default:
 		return err

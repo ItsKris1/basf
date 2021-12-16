@@ -14,11 +14,11 @@ import (
 func AddComment(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		db := env.DB
-		isLogged, err := session.Check(db, w, r)
+		db := env.DB                             // intializes db connection
+		isLogged, err := session.Check(db, w, r) // checks if user is logged in
 
 		// If an actual error happened in session.Check
-		if err != nil && err != sql.ErrNoRows {
+		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -41,10 +41,9 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		}
 
 		id := r.URL.Query().Get("post") // id is the ID of the post, which we get from URL
-		// intializes db connection
 
 		// CheckQuery checks if the id from URL is valid and exists
-		postid, err := CheckURLQuery(db, id)
+		postid, err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", id)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
@@ -89,15 +88,16 @@ func GetUserID(db *sql.DB, cookieVal string) (int, error) {
 }
 
 // Checks the URL query by checking if its values can be converted to an integer and if it exists in database
-func CheckURLQuery(db *sql.DB, value string) (string, error) {
-	if _, err := strconv.Atoi(value); err != nil {
-		return "", err
+func CheckURLQuery(db *sql.DB, q string, value string) (int, error) {
+	id, err := strconv.Atoi(value)
+	if err != nil {
+		return 0, err
 	}
 
-	if err := db.QueryRow("SELECT postid FROM posts WHERE postid = ?", value).Scan(&value); err != nil {
-		return "", err
+	if err := db.QueryRow(q, id).Scan(&id); err != nil {
+		return 0, err
 
 	}
 
-	return value, nil
+	return id, nil
 }
