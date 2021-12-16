@@ -20,50 +20,62 @@ type Comment struct {
 }
 
 type ViewPostPage struct {
-	Post     Post // Post struct is in index.go
+	Post     Post // Post struct is in home.go
 	Comments []Comment
 	UserInfo session.User
 }
 
 func ViewPost(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if _, err := session.Check(env.DB, w, r); err != nil {
+		if r.Method != "GET" {
+			http.Error(w, "Wrong type of request", 400)
+			return
+		}
+
+		if _, err := session.Check(env.DB, w, r); err != nil { // Checks if user is logged in and returns 500 if something unexpected happens
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		// CheckQuery checks if the query value is valid and it exists
-		var viewPostPage ViewPostPage
-		viewPostPage.UserInfo = session.UserInfo
-		// Get the id of the post from the URL
-		postid := r.URL.Query().Get("id")
-
 		db := env.DB // intializes db connection
+
+		postid := r.URL.Query().Get("id") // Get the id of the post from the URL
 		row := db.QueryRow("SELECT * FROM posts WHERE postid = ?", postid)
 
+		post := Post{}
+
+		// Load all that post data to struct from database
 		var userid int
-		if err := row.Scan(&viewPostPage.Post.ID, &userid, &viewPostPage.Post.Title, &viewPostPage.Post.Body, &viewPostPage.Post.CreationDate); err != nil {
+		if err := row.Scan(&post.ID, &userid, &post.Title, &post.Body, &post.CreationDate); err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
-		var err error
-		viewPostPage.Post, err = AddLikesDislike(db, viewPostPage.Post)
+
+		post, err := AddLikesDislike(db, post) // home.go
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		// Get the post username by userid
-		viewPostPage.Post.Username, _ = GetUsername(db, userid)
+		post.Username, err = GetUsername(db, userid) // Get the post username by userid
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 		// Get the comments for that post
 		comments, err := postComments(db, postid)
+		if err != nil {
+			if err != sql.ErrNoRows {
+				http.Error(w, err.Error(), 500) // If the error is not ErrNoRows, something unexpected happened
+				return
+			}
+		}
 
-		if err == nil { // Only add the comments if the []Comment is not empty
-			viewPostPage.Comments = comments
-		} else if err != sql.ErrNoRows {
-			http.Error(w, err.Error(), 500) // If the error is not ErrNoRows, something unexpected happened
-			return
+		viewPostPage := ViewPostPage{
+			Post:     post,
+			Comments: comments,
+			UserInfo: session.UserInfo,
 		}
 
 		tpl.RenderTemplates(w, "viewpost.html", viewPostPage, "./templates/base.html", "./templates/posts/viewpost.html")

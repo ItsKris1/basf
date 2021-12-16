@@ -35,15 +35,15 @@ func Home(env *env.Env) http.HandlerFunc {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-		homePage := HomePage{
-			UserInfo: session.UserInfo, // We need UserInfo for "base.html" template
-		}
 
-		if posts, err := allPosts(env.DB); err == nil { // If err is nil, we know we got all the posts
-			homePage.AllPosts = posts
-		} else {
+		posts, err := allPosts(env.DB)
+		if err != nil { // If err is nil, we know we got all the posts
 			http.Error(w, err.Error(), 500)
 			return
+		}
+		homePage := HomePage{
+			UserInfo: session.UserInfo, // We need UserInfo for "base.html" template
+			AllPosts: posts,
 		}
 
 		tpl.RenderTemplates(w, "home.html", homePage, "./templates/base.html", "./templates/home.html")
@@ -74,6 +74,11 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
+		post, err = AddLikesDislike(db, post)
+		if err != nil {
+			return posts, err
+		}
+
 		postTags, err := getPostTags(db, post.ID)
 		if err != nil {
 			return posts, err
@@ -81,11 +86,6 @@ func allPosts(db *sql.DB) ([]Post, error) {
 
 		post.Username = username
 		post.Tags = postTags
-
-		post, err = AddLikesDislike(db, post)
-		if err != nil {
-			return posts, err
-		}
 
 		posts = append(posts, post)
 	}
@@ -97,14 +97,17 @@ func allPosts(db *sql.DB) ([]Post, error) {
 	return posts, nil
 
 }
+
+/* Adds the count of likes and dislikes to a post */
 func AddLikesDislike(db *sql.DB, post Post) (Post, error) {
-	var res int
 
 	// Check if post has any likes or dislikes
-	if err := db.QueryRow("SELECT postid FROM postlikes WHERE postid = ?", post.ID).Scan(&res); err == nil {
+	var temp int
+	if err := db.QueryRow("SELECT postid FROM postlikes WHERE postid = ?", post.ID).Scan(&temp); err == nil {
 
 		q := "SELECT COUNT(like) FROM postlikes WHERE like = ? AND postid = ?"
 
+		// Get the dislike count for the post
 		var dislikeCount int
 		if err := db.QueryRow(q, 0, post.ID).Scan(&dislikeCount); err == nil {
 			post.DislikeCount = dislikeCount
@@ -113,6 +116,7 @@ func AddLikesDislike(db *sql.DB, post Post) (Post, error) {
 			return post, err
 		}
 
+		// Get the like count for the post
 		var likeCount int
 		if err := db.QueryRow(q, 1, post.ID).Scan(&likeCount); err == nil {
 			post.LikeCount = likeCount
@@ -131,11 +135,14 @@ func getPostTags(db *sql.DB, postid int) ([]string, error) {
 	}
 
 	var postTags []string
+
 	for rows.Next() {
 		var tagid string
 
 		if err := rows.Scan(&tagid); err != nil {
-			return postTags, err
+			if err != sql.ErrNoRows {
+				return postTags, err
+			}
 		}
 
 		tagname, err := getTagName(db, tagid)

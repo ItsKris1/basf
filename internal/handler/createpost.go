@@ -18,13 +18,9 @@ type CreatePostPage struct {
 
 func CreatePost(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		createPostPage := CreatePostPage{
-			UserInfo: session.UserInfo,
-		}
-
 		db := env.DB // intializes db connection
 
-		if r.Method == "POST" {
+		if r.Method == "POST" { // If user is creating a post
 
 			if err := r.ParseForm(); err != nil {
 				http.Error(w, err.Error(), 400)
@@ -52,9 +48,9 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 			http.Redirect(w, r, "/", 302)
 			return
 
-		} else { // If the method is GET
-			isLogged, err := session.Check(db, w, r)
+		} else if r.Method == "GET" { // If the method is GET
 
+			isLogged, err := session.Check(db, w, r)
 			if err != nil && err != sql.ErrNoRows {
 				http.Error(w, err.Error(), 500)
 				return
@@ -71,10 +67,16 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				http.Error(w, err.Error(), 500)
 				return
 			}
-			createPostPage.Tags = allTags
+			createPostPage := CreatePostPage{
+				UserInfo: session.UserInfo,
+				Tags:     allTags,
+			}
 
 			tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/posts/createpost.html", "./templates/base.html")
 
+		} else {
+			http.Error(w, "Wrong type of request", 400)
+			return
 		}
 
 	}
