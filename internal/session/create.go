@@ -2,7 +2,6 @@ package session
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -13,26 +12,25 @@ func Create(userid int, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	cookie, err := r.Cookie("session")
 
 	if err != nil { // If cookie doesnt exist, we are making a new one
-		uuid := uuid.New().String()
-		timeNow := time.Now()
-		cookie = &http.Cookie{
-			Name:    "session",
-			Value:   uuid,
-			Expires: timeNow.Add(time.Minute * 30),
-		}
-
-		http.SetCookie(w, cookie)
-		if err := AddSession(db, userid, uuid, timeNow); err != nil {
-			http.Error(w, err.Error(), 500) // Adding session to db
+		if err != http.ErrNoCookie {
+			http.Error(w, err.Error(), 500)
 			return
 		}
-
-	} else {
-		fmt.Println("Cookie cant exist!") // If a cookie exists, which in our case IT CANT, we throw an error
-		http.Error(w, err.Error(), 500)
-		return
-
 	}
+	uuid := uuid.New().String()
+	timeNow := time.Now()
+	cookie = &http.Cookie{
+		Name:    "session",
+		Value:   uuid,
+		Expires: timeNow.Add(time.Minute * 30),
+	}
+
+	http.SetCookie(w, cookie)
+	if err := AddSession(db, userid, uuid, timeNow); err != nil {
+		http.Error(w, err.Error(), 500) // Adding session to db
+		return
+	}
+
 }
 
 func AddSession(db *sql.DB, userid int, uuid string, timeNow time.Time) error {

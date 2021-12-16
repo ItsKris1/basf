@@ -26,8 +26,12 @@ type HomePage struct {
 
 func Home(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		session.Check(env.DB, w, r) // Every time the user goes to home page it checks if he is logged in
 
+		// Every time the user goes to home page it checks if he is logged in
+		if _, err := session.Check(env.DB, w, r); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 		homePage := HomePage{
 			UserInfo: session.UserInfo, // We need UserInfo for "base.html" template
 		}

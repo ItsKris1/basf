@@ -11,16 +11,16 @@ func Like(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		db := env.DB
 		cookie, err := r.Cookie("session")
-		if err != nil { // Cookie was not found
+		if err != nil {
 			auth.LoginMsgs.LoginRequired = true // LoginMsgs is defined in auth/loginauth.go
-			http.Redirect(w, r, "/login", 301)
+			http.Redirect(w, r, "/login", 302)
 			return
 		}
 
 		userid, err := GetUserID(db, cookie.Value) // GetUserID is in comment.go
 		if err == sql.ErrNoRows {
 			auth.LoginMsgs.LoginRequired = true
-			http.Redirect(w, r, "/login", 301)
+			http.Redirect(w, r, "/login", 302)
 			return
 
 		} else if err != nil {

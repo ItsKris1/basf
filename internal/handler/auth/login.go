@@ -14,7 +14,6 @@ type LoginPage struct {
 
 func Login(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		session.Check(env.DB, w, r)
 		loginPage := LoginPage{
 			UserInfo:  session.UserInfo,
 			LoginMsgs: LoginMsgs,

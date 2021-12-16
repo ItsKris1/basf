@@ -52,6 +52,6 @@ func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) (bool, error) {
 			return false, err
 		}
 
-		return true, nil
+		return true, err
 	}
 }

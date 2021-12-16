@@ -22,6 +22,11 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 			return
 		}
 
+		if _, err := session.Check(env.DB, w, r); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
 		db := env.DB
 
 		userid := r.URL.Query().Get("id")

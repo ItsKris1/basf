@@ -27,6 +27,10 @@ type ViewPostPage struct {
 
 func ViewPost(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if _, err := session.Check(env.DB, w, r); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 		// CheckQuery checks if the query value is valid and it exists
 		var viewPostPage ViewPostPage
