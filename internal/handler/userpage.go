@@ -3,10 +3,10 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
+	"forum/internal/handler/funcs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
-	"strconv"
 )
 
 type UserPage struct {
@@ -28,14 +28,8 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 		}
 
 		db := env.DB
-
 		userid := r.URL.Query().Get("id")
-		if _, err := strconv.Atoi(userid); err != nil {
-			http.Error(w, err.Error(), 400)
-			return
-		}
-
-		if err := db.QueryRow("SELECT id FROM users WHERE id = ?", userid).Scan(&userid); err != nil {
+		if err := funcs.CheckURLQuery(db, "SELECT userid FROM users WHERE userid = ?", userid); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
