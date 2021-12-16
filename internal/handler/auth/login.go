@@ -15,8 +15,8 @@ type LoginPage struct {
 func Login(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		loginPage := LoginPage{
-			UserInfo:  session.UserInfo,
-			LoginMsgs: LoginMsgs,
+			UserInfo:  session.UserInfo, // UserInfo is in session/check.go
+			LoginMsgs: LoginMsgs,        // created in loginauth.go
 		}
 
 		tpl.RenderTemplates(w, "login.html", loginPage, "./templates/auth/login.html", "./templates/base.html")

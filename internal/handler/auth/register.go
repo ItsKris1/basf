@@ -14,8 +14,8 @@ type RegisterPage struct {
 func Register() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		registerPage := RegisterPage{
-			RegMsgs:  RegMsgs, // RegMsgs is created in registerauth.go
-			UserInfo: session.UserInfo,
+			RegMsgs:  RegMsgs,          // RegMsgs is created in registerauth.go
+			UserInfo: session.UserInfo, // UserInfo is in session/check.go
 		}
 
 		tpl.RenderTemplates(w, "register.html", registerPage, "./templates/auth/register.html", "./templates/base.html")

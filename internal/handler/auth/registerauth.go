@@ -60,9 +60,11 @@ func RegisterAuth(env *env.Env) http.HandlerFunc {
 
 			LoginMsgs.SuccesfulRegister = true // This is to tell user on login page whether their registration was succesful
 			http.Redirect(w, r, "/login", 302)
+			return
 
 		} else {
 			http.Redirect(w, r, "/register", 302)
+			return
 		}
 	}
 }
@@ -83,11 +85,11 @@ func RowExists(q string, value string, db *sql.DB) bool {
 	case sql.ErrNoRows:
 		return false
 
-	case nil: // Match found
+	case nil:
 		return true
 
 	default:
-		log.Println(err)
+
 		return false
 	}
 }

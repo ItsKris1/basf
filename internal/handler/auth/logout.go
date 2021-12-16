@@ -2,24 +2,25 @@ package auth
 
 import (
 	"forum/internal/env"
-	"log"
 	"net/http"
 	"time"
 )
 
 func Logout(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		db := env.DB
-
 		cookie, err := r.Cookie("session")
-		if err != nil { // If there is no cookie we dont have to do anyhing
-			http.Redirect(w, r, "/", 302)
-			return
+		if err != nil {
+			if err != http.ErrNoCookie {
+				http.Error(w, err.Error(), 500)
+				return
+			}
 		}
 
+		db := env.DB
 		stmt, err := db.Prepare("DELETE FROM sessions WHERE uuid = ?")
 		if err != nil {
-			log.Fatal(err)
+			http.Error(w, err.Error(), 500)
+			return
 		}
 		stmt.Exec(cookie.Value)
 
@@ -27,6 +28,8 @@ func Logout(env *env.Env) http.HandlerFunc {
 		http.SetCookie(w, cookie)
 
 		http.Redirect(w, r, "/", 302)
+		return
+
 	}
 
 }
