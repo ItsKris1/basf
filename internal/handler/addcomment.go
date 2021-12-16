@@ -1,13 +1,12 @@
 package handler
 
 import (
-	"database/sql"
 	"fmt"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
+	"forum/internal/handler/funcs"
 	"forum/internal/session"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -43,14 +42,14 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		postid := r.URL.Query().Get("post") // id is the ID of the post, which we get from URL
 
 		// CheckQuery checks if the id from URL is valid and exists
-		if err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
+		if err := funcs.CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
 
 		cookie, _ := r.Cookie("session")
 
-		userid, err := GetUserID(db, cookie.Value)
+		userid, err := funcs.GetUserID(db, cookie.Value)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -71,28 +70,4 @@ func AddComment(env *env.Env) http.HandlerFunc {
 	}
 }
 
-func GetUserID(db *sql.DB, cookieVal string) (int, error) {
-	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieVal)
-
-	var userid int
-	if err := row.Scan(&userid); err != nil {
-		return 0, err
-	}
-
-	return userid, nil
-}
-
 // Checks the URL query by checking if its values can be converted to an integer and if it exists in database
-func CheckURLQuery(db *sql.DB, q string, value string) error {
-	id, err := strconv.Atoi(value)
-	if err != nil {
-		return err
-	}
-
-	if err := db.QueryRow(q, id).Scan(&id); err != nil {
-		return err
-
-	}
-
-	return nil
-}
