@@ -40,20 +40,15 @@ func AddComment(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		id := r.URL.Query().Get("post") // id is the ID of the post, which we get from URL
+		postid := r.URL.Query().Get("post") // id is the ID of the post, which we get from URL
 
 		// CheckQuery checks if the id from URL is valid and exists
-		postid, err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", id)
-		if err != nil {
+		if err := CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
 
-		cookie, err := r.Cookie("session")
-		if err != nil { // If there is no active cookie we redirect the user to home page
-			http.Error(w, err.Error(), 500)
-			return
-		}
+		cookie, _ := r.Cookie("session")
 
 		userid, err := GetUserID(db, cookie.Value)
 		if err != nil {
@@ -88,16 +83,16 @@ func GetUserID(db *sql.DB, cookieVal string) (int, error) {
 }
 
 // Checks the URL query by checking if its values can be converted to an integer and if it exists in database
-func CheckURLQuery(db *sql.DB, q string, value string) (int, error) {
+func CheckURLQuery(db *sql.DB, q string, value string) error {
 	id, err := strconv.Atoi(value)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	if err := db.QueryRow(q, id).Scan(&id); err != nil {
-		return 0, err
+		return err
 
 	}
 
-	return id, nil
+	return nil
 }

@@ -35,7 +35,6 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 		// CheckQuery checks if the query value is valid and it exists
 		var viewPostPage ViewPostPage
 		viewPostPage.UserInfo = session.UserInfo
-
 		// Get the id of the post from the URL
 		postid := r.URL.Query().Get("id")
 
