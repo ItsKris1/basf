@@ -9,6 +9,7 @@ import (
 
 type SearchResultsPage struct {
 	UserInfo session.User
+	AllTags  []string // For the search box in search results page
 	Results  []Post
 }
 
@@ -58,12 +59,18 @@ func Search(env *env.Env) http.HandlerFunc {
 			return
 		}
 
+		allTags, err := GetAllTags(db)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 		searchPage := SearchResultsPage{
 			UserInfo: session.UserInfo,
 			Results:  results,
+			AllTags:  allTags,
 		}
 
-		tpl.RenderTemplates(w, "searchresults.html", searchPage, "./templates/base.html", "./templates/searchresults.html")
+		tpl.RenderTemplates(w, "searchresults.html", searchPage, "./templates/base.html", "./templates/searchresults.html", "./templates/searchbar.html")
 		return
 	}
 }
