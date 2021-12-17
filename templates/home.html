@@ -5,34 +5,37 @@
 
 <div class="container w-50 my-3 d-flex flex-column align-items-end gap-5 ">
     <div class="justify-self-end">
-        <a class="btn btn-primary" href="/createpost" role="button">Create a post</a>
+
     </div>
 
-
-
-    {{ range $post := .AllPosts }}
-
-    <div class="card border-secondary w-100">
-        <h5 class="card-header">Everyday electronics</h5>
-        <div class="card-body">
-            <p class="card-text "><a href="/post?id={{$post.ID}}" class="text-dark">{{$post.Title}}</a>
-            </p>
-
-
-            <small class="text-muted">Tags:
-                {{ range $post.Tags}}
-                {{.}}
-                {{end}}
-            </small>
-            <br>
-            <small class="text-muted">Topic started: {{$post.CreationDate}}</small>
-
-
+    <div class="card w-100">
+        <div class="card-header d-flex justify-content-between">
+            <span class="align-self-center">Featured</span> <a class="btn btn-sm btn-secondary " href="/createpost"
+                role="button">Create a post</a>
         </div>
+        <ul class="list-group list-group-flush">
+            {{ range $post := .AllPosts }}
+
+            <li class="list-group-item">
+                <p class="card-text "><a href="/post?id={{$post.ID}}" class="text-dark">{{$post.Title}}</a>
+                </p>
+
+
+                <small class="text-muted">Tags:
+                    {{ range $post.Tags}}
+                    {{.}}
+                    {{end}}
+                </small>
+                <br>
+                <small class="text-muted">Topic started: {{$post.CreationDate}}</small>
+            </li>
+            {{ end}}
+
+        </ul>
     </div>
+
+
+
 
 
     {{end}}
-</div>
-
-{{end}}
