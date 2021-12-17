@@ -1,17 +1,16 @@
 :root {
   --text-color: rgb(201, 182, 182);
-  --form-color: #393f46;
+  --form-color: #434950;
 }
 
 body {
   background-color: #263238;
 }
-
-textarea.form-control,
-textarea.form-control:focus {
+.form-control,
+.form-control:focus {
   background-color: var(--form-color);
-  color: var(--text-color);
   border: 0;
+  color: var(--text-color);
 }
 
 .card,
