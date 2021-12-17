@@ -29,7 +29,7 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 
 		db := env.DB
 		userid := r.URL.Query().Get("id")
-		if err := funcs.CheckURLQuery(db, "SELECT userid FROM users WHERE userid = ?", userid); err != nil {
+		if err := funcs.CheckURLQuery(db, "SELECT id FROM users WHERE id = ?", userid); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}

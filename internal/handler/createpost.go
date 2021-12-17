@@ -63,7 +63,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				return
 			}
 			// allTags is for displaying all the possible tags while creating the post
-			allTags, err := getAllTags(db)
+			allTags, err := GetAllTags(db)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -164,7 +164,7 @@ func addPosts(db *sql.DB, r *http.Request) error {
 
 }
 
-func getAllTags(db *sql.DB) ([]string, error) {
+func GetAllTags(db *sql.DB) ([]string, error) {
 	rows, err := db.Query("SELECT name FROM tags")
 	if err != nil {
 		return nil, err

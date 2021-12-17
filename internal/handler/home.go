@@ -22,6 +22,7 @@ type Post struct {
 type HomePage struct {
 	UserInfo session.User
 	AllPosts []Post
+	AllTags  []string
 }
 
 func Home(env *env.Env) http.HandlerFunc {
@@ -41,12 +42,20 @@ func Home(env *env.Env) http.HandlerFunc {
 			http.Error(w, err.Error(), 500)
 			return
 		}
+
+		tags, err := GetAllTags(env.DB) // function is in createpost.go (line 167)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
 		homePage := HomePage{
 			UserInfo: session.UserInfo, // We need UserInfo for "base.html" template
 			AllPosts: posts,
+			AllTags:  tags,
 		}
 
-		tpl.RenderTemplates(w, "home.html", homePage, "./templates/base.html", "./templates/home.html")
+		tpl.RenderTemplates(w, "home.html", homePage, "./templates/base.html", "./templates/searchbar.html", "./templates/home.html")
 
 	}
 }
