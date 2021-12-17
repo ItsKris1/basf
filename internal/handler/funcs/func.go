@@ -5,16 +5,6 @@ import (
 	"strconv"
 )
 
-/*
-1. Looks if user has reacted to that post
-
-2. If it founds user has reacted
-	2.1 If user previously liked that post and then dislikes it, the "like" value is updated accordingly
-	2.2 If user previously disliked that post and then likes it, the "like" value is updated accordingly
-
-3. If it founds user has not reacted
-	3.1 Add the postid, userid and like(0 if disliked, 1 if liked) to "postlikes" table
-*/
 func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	// Query for which returns us whether user has liked or disliked that post
 	row := db.QueryRow("SELECT like FROM postlikes WHERE userid = ? AND postid = ?", userid, postid)
@@ -54,7 +44,6 @@ func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	return nil
 }
 
-/* CheckCommentLikes works the same way as function CheckPostLikes(line 77) just with comments */
 func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
 	row := db.QueryRow("SELECT like FROM commentlikes WHERE userid = ? AND commentid = ?", userid, commentid)
 

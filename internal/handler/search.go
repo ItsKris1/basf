@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"forum/internal/env"
 	"forum/internal/session"
 	"forum/internal/tpl"
@@ -22,44 +23,24 @@ func Search(env *env.Env) http.HandlerFunc {
 
 		tagName := r.URL.Query().Get("tags")
 
-		db := env.DB
-
 		var tagid string
-		if err := db.QueryRow("SELECT id FROM tags WHERE name = ?", tagName).Scan(&tagid); err != nil {
+		if err := env.DB.QueryRow("SELECT id FROM tags WHERE name = ?", tagName).Scan(&tagid); err != nil {
+			if err == sql.ErrNoRows {
+				http.Error(w, "Tag doesnt exist", 400)
+				return
+			}
+
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		rows, err := db.Query("SELECT postid FROM posttags WHERE tagid = ?", tagid)
+		results, err := getPosts(env.DB, tagid)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		var results []Post
-		for rows.Next() {
-			var post Post
-
-			var postid string
-			if err := rows.Scan(&postid); err != nil {
-				http.Error(w, err.Error(), 500)
-				return
-			}
-
-			if err := db.QueryRow("SELECT title, body, creation_date FROM posts WHERE postid = ?", postid).Scan(&post.Title, &post.Body, &post.CreationDate); err != nil {
-				http.Error(w, err.Error(), 500)
-				return
-			}
-
-			results = append(results, post)
-		}
-
-		if err := rows.Err(); err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-
-		allTags, err := GetAllTags(db)
+		allTags, err := GetAllTags(env.DB)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -73,4 +54,33 @@ func Search(env *env.Env) http.HandlerFunc {
 		tpl.RenderTemplates(w, "searchresults.html", searchPage, "./templates/base.html", "./templates/searchresults.html", "./templates/searchbar.html")
 		return
 	}
+}
+
+func getPosts(db *sql.DB, tagid string) ([]Post, error) {
+	rows, err := db.Query("SELECT postid FROM posttags WHERE tagid = ?", tagid)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []Post
+	for rows.Next() {
+		var post Post
+
+		var postid string
+		if err := rows.Scan(&postid); err != nil {
+			return results, err
+		}
+
+		if err := db.QueryRow("SELECT title, body, creation_date FROM posts WHERE postid = ?", postid).Scan(&post.Title, &post.Body, &post.CreationDate); err != nil {
+			return results, err
+		}
+
+		results = append(results, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return results, err
+	}
+
+	return results, nil
 }
