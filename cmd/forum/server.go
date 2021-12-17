@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/post", handler.ViewPost(env))
 	http.HandleFunc("/addcomment", handler.AddComment(env))
 
+	http.HandleFunc("/search", handler.Search(env))
 	http.HandleFunc("/like", likes.Like(env))
 	http.HandleFunc("/dislike", likes.Dislike(env))
 
