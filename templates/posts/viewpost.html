@@ -12,18 +12,18 @@
             {{.Post.Title}}
         </div>
         <div class="row g-0">
-            <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
+            <div class="col-md-4 w-auto d-flex flex-column align-items-center justify-content-center">
                 <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
                 <p class="card-text my-1">{{.Post.Username}}</p>
 
 
             </div>
 
-            <div class="col-md-8 w-75 ">
+            <div class="col-md-8 flex-fill ">
 
-                <div class="card-body h-100 d-flex flex-column justify-content-around">
+                <div class="card-body h-100 d-flex flex-column justify-content-between">
 
-                    <p class="card-text">{{.Post.Body}}</p>
+                    <p class="card-text mt-2">{{.Post.Body}}</p>
 
                     <div class="container">
                         <p class="card-text d-inline-block"><small class="text-muted">
@@ -51,19 +51,19 @@
     {{ range .Comments }}
     <div class="card mb-3 w-100">
         <div class="row g-0">
-            <div class="col-md-4 w-25 d-flex flex-column align-items-center justify-content-center">
-                <img src="/assets/userprofile.png" class="" alt="..." style="max-width: 130px; height: 55%;">
+            <div class="col-md-4 w-auto d-flex flex-column align-items-center justify-content-center">
+                <img src="/assets/userprofile.png" class="w-auto" alt="..." style="max-width: 130px; height: 55%;">
                 <p class="card-text my-1">{{.Username}}</p>
 
 
             </div>
-            <div class="col-md-8 w-75 ">
-                <div class="card-body h-100 d-flex flex-column  justify-content-around">
+            <div class="col-md-8 flex-fill ">
+                <div class="card-body h-100 d-flex flex-column  justify-content-between">
 
-                    <p class="card-text">{{.Body}}</p>
+                    <p class="card-text mt-2">{{.Body}}</p>
 
                     <div class="container">
-                        <p class="card-text d-inline-block"><small class="text-muted">Created:
+                        <p class="card-text d-inline-block" style="margin: 0;"><small class="text-muted">Created:
                                 {{.CreationDate}}</small>
                         </p>
 
@@ -91,7 +91,7 @@
 
     <div class="w-75" id="postbtn">
         <form action="/addcomment?post={{.Post.ID}}" method="post">
-            <textarea class="form-control mt-5" name="body" id="body" rows="5" required></textarea>
+            <textarea class="form-control mt-5 shadow rounded" name="body" id="body" rows="5" required></textarea>
             <button class="btn btn-primary float-end my-3" type="submit">Post</button>
         </form>
     </div>
