@@ -1,40 +1,54 @@
 {{template "base" .}}
 {{define "content"}}
 
+<div class="container-fluid" style="width: 40%;">
+    <form action="/createpost" method="post">
 
-<form action="/createpost" method="post">
-    <div class="form-control">
-        Title: <input type="text" name="title" id="title" required>
-    </div>
+        <div class="mt-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" name="title" id="title" class="form-control" required>
+        </div>
 
 
-    <div class="form-control">
-        <textarea name="body" id="body" cols="30" rows="10" required></textarea>
-    </div>
+        <div class="mt-3">
+            <label for="body" class="form-label">Text</label>
+            <textarea name="body" id="body" cols="10" rows="6" class="form-control" required> </textarea>
+        </div>
 
-    <label for="tag-select">Tags: </label>
-    <select class="tag-select" multiple="multiple" name="tags" required>
-      {{ range .Tags}}
-      <option >{{.}}</option>
-      
-      {{ end }}
+        <div class="mt-3">
+            <label for="tags" style="display: block;">Tags</label>
+            <select style="overflow:hidden;" class="selectpicker dropdown" data-live-search="true"
+                title="Select a tag..." name="tags" id="tags" multiple required data-dropup-auto="false"
+                data-actions-box="true" data-width="100%">
+                {{ range .Tags}}
+                <option style="background-color: #434950; color: rgb(216, 205, 205);" value="{{.}}">{{.}}
+                </option>
+                {{ end}}
+            </select>
+        </div>
 
-    </select>
-  
 
-    <button type="submit">Create</button>
 
-   
-</form>
+        <button type="submit" class="btn btn-primary mt-3 float-right">Create</button>
+
+
+    </form>
+</div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    $('.tag-select').select2({
-        tags: true,
-        width: "50%"
+    $(document).ready(function () {
+        $('.tags').select2({
+            tags: true,
+            width: "50%"
+        });
+
     });
-});
+
+    $($('.tags').data('select2').$container).addClass('error')
+
+
 </script>
 {{end}}
