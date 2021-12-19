@@ -28,19 +28,29 @@ input[type="search"].form-control {
   background-color: rgb(43, 39, 39);
 }
 
-#searchbtn {
-  border-radius: 0 5px 5px 0;
+#custom-btn:hover {
+  background-color: #4d6674;
 }
 
-/*
-Select 2
-*/
+/* Change autocomplete input background color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #434950 inset !important;
+}
 
+input:-webkit-autofill {
+  -webkit-text-fill-color: white !important;
+}
+/* END */
+
+/* Select 2 */
 /* Input field */
-
 .select2-container--default .select2-selection--single {
   border: none !important;
 }
+
 #bap + .select2 .select2-selection__rendered {
   background-color: yellow;
   line-height: 30px;
@@ -78,6 +88,8 @@ Select 2
 #select2-bap-results .select2-results__option--selected {
   background-color: green;
 }
+
+/* END */
 
 @media only screen and (min-width: 600px) {
   #viewpost-container {
