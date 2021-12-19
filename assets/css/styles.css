@@ -37,10 +37,15 @@ Select 2
 */
 
 /* Input field */
+
+.select2-container--default .select2-selection--single {
+  border: none !important;
+}
 #bap + .select2 .select2-selection__rendered {
   background-color: yellow;
+  line-height: 30px;
+  border: 3px solid gray;
 }
-
 /* Each result */
 #select2-bap-results {
   background-color: salmon;
@@ -53,7 +58,7 @@ Select 2
 
 /* Selected option */
 #select2-bap-results .select2-results__option[aria-selected="true"] {
-  background-color: rgb(13, 14, 14) !important;
+  background-color: rgb(65, 124, 124) !important;
 }
 
 /* Around the search field */
@@ -61,9 +66,17 @@ Select 2
   background-color: orange;
 }
 
+.select2-container--open .select2-dropdown {
+  border: 2px solid black;
+}
+
 /* Search field */
 .select2-search input {
   background-color: pink;
+}
+
+#select2-bap-results .select2-results__option--selected {
+  background-color: green;
 }
 
 @media only screen and (min-width: 600px) {
