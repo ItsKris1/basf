@@ -1,18 +1,19 @@
 {{ define "searchbar"}}
 
-<form action="/search" method="get" class="d-flex w-25" style="font-size: 5px;">
-    <select class="selectpicker" data-live-search="true" title="Select a tag..." name="tags" id="test"
-        data-width="100%">
-        {{ range .AllTags}}
-        <option style="background-color: #434950; color: rgb(216, 205, 205);" value="{{.}}">{{.}}
-        </option>
-        {{ end}}
+<form action="/search" method="get" class="d-flex w-25">
+    <select id="bap" class="select2" style="width: 100%;" name="state">
+        <option value="AL">Alabama</option>
+        <option value="WY">Wyoming</option>
+        <option value="WY">Wyoming</option>
+        <option value="WY">Wyoming</option>
     </select>
-    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    <button type="submit" class="btn btn-primary btn-sm" id="searchbtn">Search</button>
 
 </form>
 
 <script>
+
+
 </script>
 
 {{ end}}

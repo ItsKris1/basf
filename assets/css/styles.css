@@ -24,79 +24,44 @@ input[type="search"].form-control {
 .card-header {
   background-color: #374c56;
 }
-
-select2-tags-2d-container-choice-tafe-pineapple input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #434950 inset !important;
-}
-input:-webkit-autofill {
-  -webkit-text-fill-color: var(--text-color) !important;
-}
-
 .bgdark {
   background-color: rgb(43, 39, 39);
 }
 
-div.dropdown.bootstrap-select.show > div.dropdown-menu.show {
-  background-color: var(--form-color);
+#searchbtn {
+  border-radius: 0 5px 5px 0;
 }
 
-div.dropdown-menu.show
-  > div.inner.show
-  > ul.dropdown-menu.inner.show
-  > li.no-results {
-  background-color: var(--form-color);
-  color: var(--text-color);
+/*
+Select 2
+*/
+
+/* Input field */
+#bap + .select2 .select2-selection__rendered {
+  background-color: yellow;
 }
 
-div.dropdown-menu.show > div.inner.show > ul.dropdown-menu.inner.show {
-  background-color: var(--form-color);
+/* Each result */
+#select2-bap-results {
+  background-color: salmon;
 }
 
-div.dropdown.bootstrap-select.show-tick.show > div.dropdown-menu.show {
-  background-color: var(--form-color);
-  position: relative !important;
-  transform: none !important;
+/* Higlighted (hover) result */
+#select2-bap-results .select2-results__option--highlighted {
+  background-color: rgb(5, 27, 27) !important;
 }
 
-div.dropdown.bootstrap-select.show-tick.show
-  > button.btn.dropdown-toggle.bs-placeholder.btn-light {
-  background-color: var(--form-color);
-  color: var(--text-color);
-  border: 1px solid rgb(97, 92, 92);
+/* Selected option */
+#select2-bap-results .select2-results__option[aria-selected="true"] {
+  background-color: rgb(13, 14, 14) !important;
 }
 
-div.dropdown.bootstrap-select.show-tick
-  > button.btn.dropdown-toggle.bs-placeholder.btn-light,
-div.dropdown.bootstrap-select.show-tick
-  > button.btn.dropdown-toggle.bs-placeholder.btn-light:focus {
-  background-color: var(--form-color);
-  color: var(--text-color);
-  border: 1px solid rgb(97, 92, 92) !important;
+/* Around the search field */
+.select2-search {
+  background-color: orange;
 }
 
-.bootstrap-select .dropdown-toggle:focus,
-.bootstrap-select > select.mobile-device:focus + .dropdown-toggle {
-  outline: none !important;
-}
-
-.btn-light,
-.btn-light:hover {
-  color: white !important;
-  box-shadow: none !important;
-  background-color: rgb(83, 75, 75);
-  border: 0;
-}
-
-.bootstrap-select > .dropdown-toggle {
-  background-color: var(--form-color) !important;
-  background-color: var(--form-color);
-  border: 1px solid rgb(97, 92, 92) !important;
-  color: var(--text-color);
-}
-
-.show > .btn-light.dropdown-toggle {
-  color: var(--text-color) !important;
+/* Search field */
+.select2-search input {
+  background-color: pink;
 }
