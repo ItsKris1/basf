@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"fmt"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
@@ -68,4 +69,15 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		http.Redirect(w, r, redirectURL, 302)
 
 	}
+}
+
+func GetUserID(db *sql.DB, cookieVal string) (int, error) {
+	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieVal)
+
+	var userid int
+	if err := row.Scan(&userid); err != nil {
+		return 0, err
+	}
+
+	return userid, nil
 }

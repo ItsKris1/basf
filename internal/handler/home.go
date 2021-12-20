@@ -186,14 +186,3 @@ func GetUsername(db *sql.DB, userid int) (string, error) {
 
 	return username, nil
 }
-
-func GetUserID(db *sql.DB, cookieVal string) (int, error) {
-	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieVal)
-
-	var userid int
-	if err := row.Scan(&userid); err != nil {
-		return 0, err
-	}
-
-	return userid, nil
-}

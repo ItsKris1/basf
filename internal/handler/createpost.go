@@ -20,6 +20,18 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		db := env.DB // intializes db connection
 
+		isLogged, err := session.Check(db, w, r)
+		if err != nil && err != sql.ErrNoRows {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		if !isLogged {
+			http.Redirect(w, r, "/login", 302)
+			auth.LoginMsgs.LoginRequired = true
+			return
+		}
+
 		if r.Method == "POST" { // If user is creating a post
 
 			if err := r.ParseForm(); err != nil {
@@ -27,19 +39,19 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				return
 			}
 
-			// Add data to Posts table
-			if err := addPosts(db, r); err != nil {
+			// Store all the post data to Posts table
+			if err := addPost(db, r); err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			}
 
-			// Get the ID of the tags used in create post
+			// Store the tags to Tags table
 			if err := addTags(db, r); err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			}
 
-			// Add data to PostTags table
+			// Add tags connected to post to PostTags table
 			if err := addPostTags(db, r); err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -50,17 +62,6 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 
 		} else if r.Method == "GET" { // If the method is GET
 
-			isLogged, err := session.Check(db, w, r)
-			if err != nil && err != sql.ErrNoRows {
-				http.Error(w, err.Error(), 500)
-				return
-			}
-
-			if !isLogged {
-				http.Redirect(w, r, "/login", 302)
-				auth.LoginMsgs.LoginRequired = true
-				return
-			}
 			// allTags is for displaying all the possible tags while creating the post
 			allTags, err := GetAllTags(db)
 			if err != nil {
@@ -73,6 +74,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 			}
 
 			tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/posts/createpost.html", "./templates/base.html")
+			return
 
 		} else {
 			http.Error(w, "Wrong type of request", 400)
@@ -140,9 +142,10 @@ func addPostTags(db *sql.DB, r *http.Request) error {
 1. Get the ID of the user by using UUID from the cookie
 2. Add the post title, body and ID of the user into Posts table
 */
-func addPosts(db *sql.DB, r *http.Request) error {
+func addPost(db *sql.DB, r *http.Request) error {
+	// We use cookie to get the ID of the user who created the post
 	cookie, err := r.Cookie("session")
-	if err != nil { // If there is no cookie then the session has expired
+	if err != nil {
 		return err
 	}
 
