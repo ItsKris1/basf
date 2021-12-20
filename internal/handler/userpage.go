@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
+	"forum/internal/handler/auth"
 	"forum/internal/handler/funcs"
 	"forum/internal/session"
 	"forum/internal/tpl"
@@ -22,11 +23,17 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		if _, err := session.Check(env.DB, w, r); err != nil {
+		isLogged, err := session.Check(env.DB, w, r)
+		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
+		if !isLogged {
+			http.Redirect(w, r, "/login", 302)
+			auth.LoginMsgs.LoginRequired = true
+			return
+		}
 		db := env.DB
 		userid := r.URL.Query().Get("id")
 		if err := funcs.CheckURLQuery(db, "SELECT id FROM users WHERE id = ?", userid); err != nil {
