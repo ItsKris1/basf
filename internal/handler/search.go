@@ -71,7 +71,12 @@ func getPosts(db *sql.DB, tagid string) ([]Post, error) {
 			return results, err
 		}
 
-		if err := db.QueryRow("SELECT title, body, creation_date FROM posts WHERE postid = ?", postid).Scan(&post.Title, &post.Body, &post.CreationDate); err != nil {
+		if err := db.QueryRow("SELECT postid, title, creation_date FROM posts WHERE postid = ?", postid).Scan(&post.ID, &post.Title, &post.CreationDate); err != nil {
+			return results, err
+		}
+
+		post, err := GetPostTags(db, post.ID, post)
+		if err != nil {
 			return results, err
 		}
 

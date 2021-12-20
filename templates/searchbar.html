@@ -1,19 +1,14 @@
 {{ define "searchbar"}}
 
 <form action="/search" method="get" class="d-flex w-25">
-    <select id="bap" class="select2" style="width: 100%;" name="state">
-        <option value="AL">Alabama</option>
-        <option value="WY">Wyoming</option>
-        <option value="WY">Wyoming</option>
-        <option value="WY">Wyoming</option>
+    <select id="bap" class="select2" style="width: 100%;" name="tags">
+        {{ range .AllTags}}
+        <option value="{{.}}">{{.}}</option>
+        {{end}}
     </select>
     <button type="submit" class="btn btn-primary btn-sm" id="searchbtn">Search</button>
 
 </form>
 
-<script>
-
-
-</script>
 
 {{ end}}

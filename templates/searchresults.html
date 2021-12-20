@@ -1,8 +1,29 @@
 {{template "base" .}}
 {{ define "content" }}
-{{ range .Results}}
-{{.Title}}
-{{.Body}}
-{{.CreationDate}}
-{{ end }}
-{{end}}
+
+<div class="container w-50 my-3 d-flex flex-column align-items-end gap-5 ">
+
+    <div class="card w-100">
+        <div class="card-header d-flex justify-content-between">
+            <span class="align-self-center">Featured</span>
+        </div>
+        <ul class="list-group list-group-flush">
+            {{ range .Results}}
+
+            <li class="list-group-item">
+                <p class="card-text "><a href="/post?id={{.ID}}">{{.Title}}</a>
+                </p>
+
+
+                <small class="text-muted">Tags:{{range .Tags}} {{.}} {{end}}</small>
+                <br>
+                <small class="text-muted">Topic started: {{.CreationDate}}</small>
+            </li>
+            {{ end}}
+
+        </ul>
+    </div>
+
+
+
+    {{ end }}
