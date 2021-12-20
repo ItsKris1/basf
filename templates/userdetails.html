@@ -1,18 +1,68 @@
 {{ template "base" .}}
 {{ define "content" }}
 
-<h1>Liked posts</h1>
-{{ range .LikedPosts}}
-<p>{{ .Title}}</p>
-<p>{{ .Body}}</p>
-<p>{{ .CreationDate}}</p>
-{{ end}}
+<style>
+    .col-6 {}
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-6-lg col-md">
+            <div class="card w-100">
+                <div class="card-header d-flex justify-content-between">
+                    <span class="align-self-center">Liked posts</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {{ range .LikedPosts }}
+
+                    <li class="list-group-item">
+                        <p class="card-text "><a href="/post?id={{.ID}}">{{.Title}}</a>
+                        </p>
 
 
-<h1>Created posts</h1>
-{{ range .CreatedPosts }}
-<p>{{ .Title}}</p>
-<p>{{ .Body}}</p>
-<p>{{ .CreationDate}}</p>
-{{ end }}
+                        <small class="text-muted">Tags:
+                            {{ range .Tags}}
+                            {{.}}
+                            {{end}}
+                        </small>
+                        <br>
+                        <small class="text-muted">Topic started: {{.CreationDate}}</small>
+                    </li>
+                    {{ end}}
+
+                </ul>
+            </div>
+        </div>
+        <div class="col-6-lg col-md">
+            <div class="card w-100">
+                <div class="card-header d-flex justify-content-between">
+                    <span class="align-self-center">Created posts</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {{ range .CreatedPosts }}
+
+                    <li class="list-group-item">
+                        <p class="card-text "><a href="/post?id={{.ID}}">{{.Title}}</a>
+                        </p>
+
+
+                        <small class="text-muted">Tags:
+                            {{ range .Tags}}
+                            {{.}}
+                            {{end}}
+                        </small>
+                        <br>
+                        <small class="text-muted">Topic started: {{.CreationDate}}</small>
+                    </li>
+                    {{ end}}
+
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
 {{end}}
