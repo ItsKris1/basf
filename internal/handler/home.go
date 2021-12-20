@@ -78,23 +78,21 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
-		username, err := GetUsername(db, userid)
-		if err != nil {
-			return posts, err
-		}
-
 		post, err = AddLikesDislike(db, post)
 		if err != nil {
 			return posts, err
 		}
 
-		postTags, err := getPostTags(db, post.ID)
+		post, err = GetPostTags(db, post.ID, post)
 		if err != nil {
 			return posts, err
 		}
 
+		username, err := GetUsername(db, userid)
+		if err != nil {
+			return posts, err
+		}
 		post.Username = username
-		post.Tags = postTags
 
 		posts = append(posts, post)
 	}
@@ -137,36 +135,36 @@ func AddLikesDislike(db *sql.DB, post Post) (Post, error) {
 
 	return post, nil
 }
-func getPostTags(db *sql.DB, postid int) ([]string, error) {
+func GetPostTags(db *sql.DB, postid int, post Post) (Post, error) {
 	rows, err := db.Query("SELECT tagid FROM posttags WHERE postid = ?", postid)
 	if err != nil {
-		return nil, err
+		return post, err
 	}
 
-	var postTags []string
-
+	var tags []string
 	for rows.Next() {
 		var tagid string
 
 		if err := rows.Scan(&tagid); err != nil {
 			if err != sql.ErrNoRows {
-				return postTags, err
+				return post, err
 			}
 		}
 
 		tagname, err := getTagName(db, tagid)
 		if err != nil {
-			return postTags, err
+			return post, err
 		}
 
-		postTags = append(postTags, tagname)
+		tags = append(tags, tagname)
 	}
 
 	if err := rows.Err(); err != nil {
-		return postTags, err
+		return post, err
 	}
 
-	return postTags, err
+	post.Tags = tags
+	return post, err
 }
 
 func getTagName(db *sql.DB, tagid string) (string, error) {

@@ -73,7 +73,7 @@ func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
 
 	for rows.Next() {
 		var postid int
-		var likedPost Post
+		var post Post
 
 		if err := rows.Scan(&postid); err != nil {
 			return likedPosts, err
@@ -84,12 +84,22 @@ func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
 			return likedPosts, err
 		}
 
-		row := db.QueryRow("SELECT userid, title, body, creation_date FROM posts WHERE postid = ? AND userid = ?", postid, userid)
-		if err := row.Scan(&likedPost.ID, &likedPost.Title, &likedPost.Body, &likedPost.CreationDate); err != nil {
+		row := db.QueryRow("SELECT postid, title, body, creation_date FROM posts WHERE postid = ? AND userid = ?", postid, userid)
+		if err := row.Scan(&post.ID, &post.Title, &post.Body, &post.CreationDate); err != nil {
 			return likedPosts, err
 		}
 
-		likedPosts = append(likedPosts, likedPost)
+		post, err = AddLikesDislike(db, post)
+		if err != nil {
+			return likedPosts, err
+		}
+
+		post, err := GetPostTags(db, post.ID, post)
+		if err != nil {
+			return likedPosts, err
+		}
+
+		likedPosts = append(likedPosts, post)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -100,7 +110,7 @@ func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
 }
 
 func userCreatedPosts(db *sql.DB, userid string) ([]Post, error) {
-	rows, err := db.Query("SELECT userid, title, body, creation_date FROM posts WHERE userid = ?", userid)
+	rows, err := db.Query("SELECT postid, title, body, creation_date FROM posts WHERE userid = ?", userid)
 	if err != nil {
 		return nil, err
 	}
@@ -109,12 +119,20 @@ func userCreatedPosts(db *sql.DB, userid string) ([]Post, error) {
 
 	for rows.Next() {
 
-		var createdPost Post
-		if err := rows.Scan(&createdPost.ID, &createdPost.Title, &createdPost.Body, &createdPost.CreationDate); err != nil {
+		var post Post
+		if err := rows.Scan(&post.ID, &post.Title, &post.Body, &post.CreationDate); err != nil {
+			return createdPosts, err
+		}
+		post, err = AddLikesDislike(db, post)
+		if err != nil {
 			return createdPosts, err
 		}
 
-		createdPosts = append(createdPosts, createdPost)
+		post, err := GetPostTags(db, post.ID, post)
+		if err != nil {
+			return createdPosts, err
+		}
+		createdPosts = append(createdPosts, post)
 	}
 
 	if err := rows.Err(); err != nil {

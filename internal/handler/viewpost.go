@@ -78,7 +78,7 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 			UserInfo: session.UserInfo,
 		}
 
-		tpl.RenderTemplates(w, "viewpost.html", viewPostPage, "./templates/base.html", "./templates/posts/viewpost.html")
+		tpl.RenderTemplates(w, "viewpost.html", viewPostPage, "./templates/base.html", "./templates/viewpost.html")
 	}
 }
 

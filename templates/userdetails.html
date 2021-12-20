@@ -26,7 +26,16 @@
                             {{end}}
                         </small>
                         <br>
-                        <small class="text-muted">Topic started: {{.CreationDate}}</small>
+
+                        <div class="post-footer d-flex justify-content-between">
+                            <small class="text-muted">Topic started: {{.CreationDate}}</small>
+                            <div class="likes text-light">
+                                <small>L {{.LikeCount}}</small>
+                                <small>D {{.DislikeCount}}</small>
+                            </div>
+
+                        </div>
+
                     </li>
                     {{ end}}
 
@@ -52,7 +61,14 @@
                             {{end}}
                         </small>
                         <br>
-                        <small class="text-muted">Topic started: {{.CreationDate}}</small>
+                        <div class="post-footer d-flex justify-content-between">
+                            <small class="text-muted">Topic started: {{.CreationDate}}</small>
+                            <div class="likes text-light">
+                                <small>L {{.LikeCount}}</small>
+                                <small>D {{.DislikeCount}}</small>
+                            </div>
+
+                        </div>
                     </li>
                     {{ end}}
 
