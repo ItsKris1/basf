@@ -1,26 +1,27 @@
-package likes
+package handler
 
 import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
-	"forum/internal/handler/funcs"
+	"forum/internal/handler/check"
+
 	"net/http"
 )
 
-func Like(env *env.Env) http.HandlerFunc {
+func Dislike(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		db := env.DB
 		cookie, err := r.Cookie("session")
-		if err != nil {
+		if err != nil { // Cookie was not found
 			auth.LoginMsgs.LoginRequired = true // LoginMsgs is defined in auth/loginauth.go
 			http.Redirect(w, r, "/login", 302)
 			return
 		}
 
-		userid, err := funcs.GetUserID(db, cookie.Value) // GetUserID is in comment.go
-		if err == sql.ErrNoRows {
-			auth.LoginMsgs.LoginRequired = true
+		userid, err := GetUserID(db, cookie.Value) // function is in handler/addcomment.go
+		if err == sql.ErrNoRows {                  // If an ongoing session was not found
+			auth.LoginMsgs.LoginRequired = true // LoginMsgs is defined in auth/loginauth.go
 			http.Redirect(w, r, "/login", 302)
 			return
 
@@ -38,18 +39,18 @@ func Like(env *env.Env) http.HandlerFunc {
 
 		if commentid != "" {
 			// CheckQuery checks if the id from URL is valid and exists
-			if err := funcs.CheckURLQuery(db, "SELECT id FROM comments WHERE id = ?", commentid); err != nil {
+			if err := check.URLQuery(db, "SELECT id FROM comments WHERE id = ?", commentid); err != nil {
 				http.Error(w, err.Error(), 400)
 				return
 			}
 
-			err = funcs.CheckCommentLikes(db, userid, commentid, 1)
+			err = check.CommentLikes(db, userid, commentid, 0)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			}
 
-			// Get the postid of the comment so we can redirect user to the same post after liking a comment
+			// Get the post where the comment is added
 			if err := db.QueryRow("SELECT postid FROM comments WHERE id = ?", commentid).Scan(&postid); err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -57,12 +58,12 @@ func Like(env *env.Env) http.HandlerFunc {
 
 		} else if postid != "" {
 			// CheckQuery checks if the id from URL is valid and exists
-			if err := funcs.CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
+			if err := check.URLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
 				http.Error(w, err.Error(), 400)
 				return
 			}
 
-			err = funcs.CheckPostLikes(db, postid, userid, 1)
+			err = check.PostLikes(db, postid, userid, 0)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -72,6 +73,6 @@ func Like(env *env.Env) http.HandlerFunc {
 
 		http.Redirect(w, r, "/post?id="+postid, 302)
 		return
-
 	}
+
 }

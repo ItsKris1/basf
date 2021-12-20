@@ -1,11 +1,11 @@
-package funcs
+package check
 
 import (
 	"database/sql"
 	"strconv"
 )
 
-func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
+func PostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	// Query for which returns us whether user has liked or disliked that post
 	row := db.QueryRow("SELECT like FROM postlikes WHERE userid = ? AND postid = ?", userid, postid)
 
@@ -44,7 +44,7 @@ func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	return nil
 }
 
-func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
+func CommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
 	row := db.QueryRow("SELECT like FROM commentlikes WHERE userid = ? AND commentid = ?", userid, commentid)
 
 	var likeVal int
@@ -80,7 +80,7 @@ func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) err
 
 }
 
-func CheckURLQuery(db *sql.DB, q string, value string) error {
+func URLQuery(db *sql.DB, q string, value string) error {
 	id, err := strconv.Atoi(value)
 	if err != nil {
 		return err
@@ -92,15 +92,4 @@ func CheckURLQuery(db *sql.DB, q string, value string) error {
 	}
 
 	return nil
-}
-
-func GetUserID(db *sql.DB, cookieVal string) (int, error) {
-	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieVal)
-
-	var userid int
-	if err := row.Scan(&userid); err != nil {
-		return 0, err
-	}
-
-	return userid, nil
 }

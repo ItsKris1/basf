@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
-	"forum/internal/handler/funcs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -147,7 +146,7 @@ func addPosts(db *sql.DB, r *http.Request) error {
 		return err
 	}
 
-	userid, err := funcs.GetUserID(db, cookie.Value) // GetUserID is from addcomment.go file
+	userid, err := GetUserID(db, cookie.Value)
 	if err != nil {
 		return err
 	}

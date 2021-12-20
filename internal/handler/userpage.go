@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
-	"forum/internal/handler/funcs"
+	"forum/internal/handler/check"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -36,7 +36,7 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 		}
 		db := env.DB
 		userid := r.URL.Query().Get("id")
-		if err := funcs.CheckURLQuery(db, "SELECT id FROM users WHERE id = ?", userid); err != nil {
+		if err := check.URLQuery(db, "SELECT id FROM users WHERE id = ?", userid); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}

@@ -5,7 +5,6 @@ import (
 	"forum/internal/env" // imports Env struct, where we store the db connection
 	"forum/internal/handler"
 	"forum/internal/handler/auth"
-	"forum/internal/handler/likes"
 	"log"
 	"net/http"
 
@@ -26,8 +25,8 @@ func main() {
 	http.HandleFunc("/addcomment", handler.AddComment(env))
 
 	http.HandleFunc("/search", handler.Search(env))
-	http.HandleFunc("/like", likes.Like(env))
-	http.HandleFunc("/dislike", likes.Dislike(env))
+	http.HandleFunc("/like", handler.Like(env))
+	http.HandleFunc("/dislike", handler.Dislike(env))
 
 	http.HandleFunc("/register", auth.Register())
 	http.HandleFunc("/registerauth", auth.RegisterAuth(env))
