@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
+	"forum/internal/handler/getpost"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -78,21 +79,26 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
-		post, err = AddLikesDislike(db, post)
-		if err != nil {
-			return posts, err
-		}
-
-		post, err = GetPostTags(db, post.ID, post)
+		tags, err := getpost.Tags(db, post.ID)
 		if err != nil {
 			return posts, err
 		}
 
 		username, err := GetUsername(db, userid)
 		if err != nil {
+
 			return posts, err
 		}
+
+		count, err := getpost.LikesDislike(db, post.ID)
+		if err != nil {
+			return posts, err
+		}
+
+		post.LikeCount = count.Likes
+		post.DislikeCount = count.Dislikes
 		post.Username = username
+		post.Tags = tags
 
 		posts = append(posts, post)
 	}
@@ -102,79 +108,6 @@ func allPosts(db *sql.DB) ([]Post, error) {
 	}
 
 	return posts, nil
-
-}
-
-/* Adds the count of likes and dislikes to a post */
-func AddLikesDislike(db *sql.DB, post Post) (Post, error) {
-
-	// Check if post has any likes or dislikes
-	var temp int
-	if err := db.QueryRow("SELECT postid FROM postlikes WHERE postid = ?", post.ID).Scan(&temp); err == nil {
-
-		q := "SELECT COUNT(like) FROM postlikes WHERE like = ? AND postid = ?"
-
-		// Get the dislike count for the post
-		var dislikeCount int
-		if err := db.QueryRow(q, 0, post.ID).Scan(&dislikeCount); err == nil {
-			post.DislikeCount = dislikeCount
-
-		} else if err != sql.ErrNoRows {
-			return post, err
-		}
-
-		// Get the like count for the post
-		var likeCount int
-		if err := db.QueryRow(q, 1, post.ID).Scan(&likeCount); err == nil {
-			post.LikeCount = likeCount
-
-		} else if err != sql.ErrNoRows {
-			return post, err
-		}
-	}
-
-	return post, nil
-}
-func GetPostTags(db *sql.DB, postid int, post Post) (Post, error) {
-	rows, err := db.Query("SELECT tagid FROM posttags WHERE postid = ?", postid)
-	if err != nil {
-		return post, err
-	}
-
-	var tags []string
-	for rows.Next() {
-		var tagid string
-
-		if err := rows.Scan(&tagid); err != nil {
-			if err != sql.ErrNoRows {
-				return post, err
-			}
-		}
-
-		tagname, err := getTagName(db, tagid)
-		if err != nil {
-			return post, err
-		}
-
-		tags = append(tags, tagname)
-	}
-
-	if err := rows.Err(); err != nil {
-		return post, err
-	}
-
-	post.Tags = tags
-	return post, err
-}
-
-func getTagName(db *sql.DB, tagid string) (string, error) {
-	var tagname string
-
-	if err := db.QueryRow("SELECT name FROM tags WHERE id = ?", tagid).Scan(&tagname); err != nil {
-		return "", err
-	}
-
-	return tagname, nil
 
 }
 

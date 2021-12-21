@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
+	"forum/internal/handler/getpost"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -51,17 +52,21 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		post, err := AddLikesDislike(db, post) // home.go
+		username, err := GetUsername(db, userid) // Get the post username by userid
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		post.Username, err = GetUsername(db, userid) // Get the post username by userid
+		count, err := getpost.LikesDislike(db, post.ID)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
+
+		post.LikeCount = count.Dislikes
+		post.DislikeCount = count.Likes
+		post.Username = username
 
 		// Get the comments for that post
 		comments, err := postComments(db, postid)

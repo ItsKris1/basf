@@ -5,6 +5,7 @@ import (
 	"forum/internal/env"
 	"forum/internal/handler/auth"
 	"forum/internal/handler/check"
+	"forum/internal/handler/getpost"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -89,15 +90,19 @@ func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
 			return likedPosts, err
 		}
 
-		post, err = AddLikesDislike(db, post)
+		tags, err := getpost.Tags(db, post.ID)
 		if err != nil {
 			return likedPosts, err
 		}
 
-		post, err := GetPostTags(db, post.ID, post)
+		count, err := getpost.LikesDislike(db, post.ID)
 		if err != nil {
 			return likedPosts, err
 		}
+
+		post.LikeCount = count.Likes
+		post.DislikeCount = count.Dislikes
+		post.Tags = tags
 
 		likedPosts = append(likedPosts, post)
 	}
@@ -123,15 +128,20 @@ func userCreatedPosts(db *sql.DB, userid string) ([]Post, error) {
 		if err := rows.Scan(&post.ID, &post.Title, &post.Body, &post.CreationDate); err != nil {
 			return createdPosts, err
 		}
-		post, err = AddLikesDislike(db, post)
+
+		tags, err := getpost.Tags(db, post.ID)
 		if err != nil {
 			return createdPosts, err
 		}
 
-		post, err := GetPostTags(db, post.ID, post)
+		count, err := getpost.LikesDislike(db, post.ID)
 		if err != nil {
 			return createdPosts, err
 		}
+
+		post.LikeCount = count.Likes
+		post.DislikeCount = count.Dislikes
+		post.Tags = tags
 		createdPosts = append(createdPosts, post)
 	}
 

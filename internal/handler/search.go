@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
+	"forum/internal/handler/getpost"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -75,11 +76,11 @@ func getPosts(db *sql.DB, tagid string) ([]Post, error) {
 			return results, err
 		}
 
-		post, err := GetPostTags(db, post.ID, post)
+		tags, err := getpost.Tags(db, post.ID)
 		if err != nil {
 			return results, err
 		}
-
+		post.Tags = tags
 		results = append(results, post)
 	}
 
