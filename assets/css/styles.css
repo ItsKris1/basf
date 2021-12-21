@@ -1,5 +1,4 @@
 :root {
-  --text-color: rgb(216, 205, 205);
   --form-color: #434950;
   --select-bg: #3a3f44;
   --form-border: 1px solid rgb(97, 92, 92);
@@ -11,7 +10,7 @@ body {
 .form-control,
 .form-control:focus {
   background-color: var(--form-color);
-  color: var(--text-color);
+  color: white;
   border: var(--form-border);
 }
 
@@ -30,16 +29,12 @@ input[type="search"].form-control {
   background-color: rgb(43, 39, 39);
 }
 
-#custom-btn:hover {
-  background-color: #4d6674;
-}
-
 /* Change autocomplete input background color */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #434950 inset !important;
+  -webkit-box-shadow: 0 0 0 30px var(--form-border) !important;
 }
 
 input:-webkit-autofill {
@@ -47,6 +42,7 @@ input:-webkit-autofill {
 }
 /* END */
 
+/* -------- */
 /* Select 2 with single option*/
 
 /* Input field */
@@ -90,14 +86,13 @@ input:-webkit-autofill {
   outline: none;
   background-color: var(--form-color);
   color: white;
-  border: var(--form-border)
-  border-radius: 3.5px;
+  border: var(--form-border);
 }
 /* Selected option */
 #select2-bap-results .select2-results__option--selected {
   background-color: rgb(65, 124, 124) !important;
 }
-
+/* -------- */
 /* Select 2 with multiple options*/
 span.selection > span.select2-selection.select2-selection--multiple {
   background-color: var(--form-color) !important;
@@ -108,7 +103,6 @@ span.selection > span.select2-selection.select2-selection--multiple {
 #bap2 + .select2 .select2-selection__rendered {
   background-color: var(--form-color) !important;
   color: white;
- 
 }
 
 .select2-search.select2-search--inline {
