@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
-	"forum/internal/handler/check"
+	"forum/internal/handler/query"
 
 	"net/http"
 )
@@ -19,8 +19,8 @@ func Dislike(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		userid, err := GetUserID(db, cookie.Value) // function is in handler/addcomment.go
-		if err == sql.ErrNoRows {                  // If an ongoing session was not found
+		userid, err := query.GetUserID(db, cookie.Value) // function is in handler/addcomment.go
+		if err == sql.ErrNoRows {                        // If an ongoing session was not found
 			auth.LoginMsgs.LoginRequired = true // LoginMsgs is defined in auth/loginauth.go
 			http.Redirect(w, r, "/login", 302)
 			return
@@ -39,12 +39,12 @@ func Dislike(env *env.Env) http.HandlerFunc {
 
 		if commentid != "" {
 			// CheckQuery checks if the id from URL is valid and exists
-			if err := check.URLQuery(db, "SELECT id FROM comments WHERE id = ?", commentid); err != nil {
+			if err := query.CheckURLQuery(db, "SELECT id FROM comments WHERE id = ?", commentid); err != nil {
 				http.Error(w, err.Error(), 400)
 				return
 			}
 
-			err = check.CommentLikes(db, userid, commentid, 0)
+			err = query.CheckCommentLikes(db, userid, commentid, 0)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -58,12 +58,12 @@ func Dislike(env *env.Env) http.HandlerFunc {
 
 		} else if postid != "" {
 			// CheckQuery checks if the id from URL is valid and exists
-			if err := check.URLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
+			if err := query.CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
 				http.Error(w, err.Error(), 400)
 				return
 			}
 
-			err = check.PostLikes(db, postid, userid, 0)
+			err = query.CheckPostLikes(db, postid, userid, 0)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return

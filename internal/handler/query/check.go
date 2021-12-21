@@ -1,11 +1,11 @@
-package check
+package query
 
 import (
 	"database/sql"
 	"strconv"
 )
 
-func PostLikes(db *sql.DB, postid string, userid int, isLike int) error {
+func CheckPostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	// Query for which returns us whether user has liked or disliked that post
 	row := db.QueryRow("SELECT like FROM postlikes WHERE userid = ? AND postid = ?", userid, postid)
 
@@ -44,7 +44,7 @@ func PostLikes(db *sql.DB, postid string, userid int, isLike int) error {
 	return nil
 }
 
-func CommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
+func CheckCommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
 	row := db.QueryRow("SELECT like FROM commentlikes WHERE userid = ? AND commentid = ?", userid, commentid)
 
 	var likeVal int
@@ -80,7 +80,7 @@ func CommentLikes(db *sql.DB, userid int, commentid string, isLike int) error {
 
 }
 
-func URLQuery(db *sql.DB, q string, value string) error {
+func CheckURLQuery(db *sql.DB, q string, value string) error {
 	id, err := strconv.Atoi(value)
 	if err != nil {
 		return err

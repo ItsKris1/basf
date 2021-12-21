@@ -3,7 +3,7 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
-	"forum/internal/handler/getpost"
+	"forum/internal/handler/query"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -79,18 +79,18 @@ func allPosts(db *sql.DB) ([]Post, error) {
 			return posts, err
 		}
 
-		tags, err := getpost.Tags(db, post.ID)
+		tags, err := query.GetTags(db, post.ID)
 		if err != nil {
 			return posts, err
 		}
 
-		username, err := GetUsername(db, userid)
+		username, err := query.GetUsername(db, userid)
 		if err != nil {
 
 			return posts, err
 		}
 
-		count, err := getpost.LikesDislike(db, post.ID)
+		count, err := query.GetLikesDislike(db, post.ID)
 		if err != nil {
 			return posts, err
 		}
@@ -109,13 +109,4 @@ func allPosts(db *sql.DB) ([]Post, error) {
 
 	return posts, nil
 
-}
-
-func GetUsername(db *sql.DB, userid int) (string, error) {
-	var username string
-	if err := db.QueryRow("SELECT username FROM users WHERE id = ?", userid).Scan(&username); err != nil {
-		return "", err
-	}
-
-	return username, nil
 }

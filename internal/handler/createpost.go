@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
+	"forum/internal/handler/query"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -149,7 +150,7 @@ func addPost(db *sql.DB, r *http.Request) error {
 		return err
 	}
 
-	userid, err := GetUserID(db, cookie.Value)
+	userid, err := query.GetUserID(db, cookie.Value)
 	if err != nil {
 		return err
 	}

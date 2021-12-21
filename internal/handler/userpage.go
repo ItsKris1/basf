@@ -4,8 +4,7 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
-	"forum/internal/handler/check"
-	"forum/internal/handler/getpost"
+	"forum/internal/handler/query"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -37,7 +36,7 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 		}
 		db := env.DB
 		userid := r.URL.Query().Get("id")
-		if err := check.URLQuery(db, "SELECT id FROM users WHERE id = ?", userid); err != nil {
+		if err := query.CheckURLQuery(db, "SELECT id FROM users WHERE id = ?", userid); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -90,12 +89,12 @@ func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
 			return likedPosts, err
 		}
 
-		tags, err := getpost.Tags(db, post.ID)
+		tags, err := query.GetTags(db, post.ID)
 		if err != nil {
 			return likedPosts, err
 		}
 
-		count, err := getpost.LikesDislike(db, post.ID)
+		count, err := query.GetLikesDislike(db, post.ID)
 		if err != nil {
 			return likedPosts, err
 		}
@@ -129,12 +128,12 @@ func userCreatedPosts(db *sql.DB, userid string) ([]Post, error) {
 			return createdPosts, err
 		}
 
-		tags, err := getpost.Tags(db, post.ID)
+		tags, err := query.GetTags(db, post.ID)
 		if err != nil {
 			return createdPosts, err
 		}
 
-		count, err := getpost.LikesDislike(db, post.ID)
+		count, err := query.GetLikesDislike(db, post.ID)
 		if err != nil {
 			return createdPosts, err
 		}

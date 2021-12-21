@@ -1,11 +1,10 @@
 package handler
 
 import (
-	"database/sql"
 	"fmt"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
-	"forum/internal/handler/check"
+	"forum/internal/handler/query"
 	"forum/internal/session"
 	"net/http"
 	"time"
@@ -43,14 +42,14 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		postid := r.URL.Query().Get("post") // id is the ID of the post, which we get from URL
 
 		// CheckQuery checks if the id from URL is valid and exists
-		if err := check.URLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
+		if err := query.CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
 
 		cookie, _ := r.Cookie("session")
 
-		userid, err := GetUserID(db, cookie.Value)
+		userid, err := query.GetUserID(db, cookie.Value)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -69,15 +68,4 @@ func AddComment(env *env.Env) http.HandlerFunc {
 		http.Redirect(w, r, redirectURL, 302)
 
 	}
-}
-
-func GetUserID(db *sql.DB, cookieVal string) (int, error) {
-	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieVal)
-
-	var userid int
-	if err := row.Scan(&userid); err != nil {
-		return 0, err
-	}
-
-	return userid, nil
 }

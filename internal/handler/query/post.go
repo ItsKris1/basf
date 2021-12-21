@@ -1,4 +1,4 @@
-package getpost
+package query
 
 import "database/sql"
 
@@ -8,7 +8,7 @@ type Count struct {
 }
 
 /* Adds the count of likes and dislikes to a post */
-func LikesDislike(db *sql.DB, postid int) (Count, error) {
+func GetLikesDislike(db *sql.DB, postid int) (Count, error) {
 	var counts Count
 	// Check if post has any likes or dislikes
 	var temp int
@@ -19,7 +19,7 @@ func LikesDislike(db *sql.DB, postid int) (Count, error) {
 		// Get the dislike count for the post
 		var dislikeCount int
 		if err := db.QueryRow(q, 0, postid).Scan(&dislikeCount); err == nil {
-			counts.Likes = dislikeCount
+			counts.Dislikes = dislikeCount
 
 		} else if err != sql.ErrNoRows {
 			return counts, err
@@ -37,37 +37,36 @@ func LikesDislike(db *sql.DB, postid int) (Count, error) {
 
 	return counts, nil
 }
-func Tags(db *sql.DB, postid int) ([]string, error) {
-	var postTags []string
+func GetTags(db *sql.DB, postid int) ([]string, error) {
+	var tags []string
 
 	rows, err := db.Query("SELECT tagid FROM posttags WHERE postid = ?", postid)
 	if err != nil {
-		return postTags, err
+		return tags, err
 	}
 
-	var tags []string
 	for rows.Next() {
 		var tagid string
 
 		if err := rows.Scan(&tagid); err != nil {
 			if err != sql.ErrNoRows {
-				return postTags, err
+				return tags, err
 			}
 		}
 
 		tagname, err := getTagName(db, tagid)
 		if err != nil {
-			return postTags, err
+			return tags, err
 		}
 
 		tags = append(tags, tagname)
 	}
 
 	if err := rows.Err(); err != nil {
-		return postTags, err
+		return tags, err
 	}
 
-	return postTags, err
+	return tags, err
 }
 
 func getTagName(db *sql.DB, tagid string) (string, error) {

@@ -3,7 +3,7 @@ package handler
 import (
 	"database/sql"
 	"forum/internal/env"
-	"forum/internal/handler/getpost"
+	"forum/internal/handler/query"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -76,7 +76,7 @@ func getPosts(db *sql.DB, tagid string) ([]Post, error) {
 			return results, err
 		}
 
-		tags, err := getpost.Tags(db, post.ID)
+		tags, err := query.GetTags(db, post.ID)
 		if err != nil {
 			return results, err
 		}
