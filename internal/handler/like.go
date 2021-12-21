@@ -1,30 +1,30 @@
 package handler
 
 import (
-	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/auth"
 	"forum/internal/handler/query"
+	"forum/internal/session"
 	"net/http"
 )
 
 func Like(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		db := env.DB
-		cookie, err := r.Cookie("session")
+		isLogged, err := session.Check(db, w, r)
 		if err != nil {
-			auth.LoginMsgs.LoginRequired = true // LoginMsgs is defined in auth/loginauth.go
-			http.Redirect(w, r, "/login", 302)
+			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		userid, err := query.GetUserID(db, cookie.Value) // GetUserID is in comment.go
-		if err == sql.ErrNoRows {
-			auth.LoginMsgs.LoginRequired = true
+		if !isLogged {
 			http.Redirect(w, r, "/login", 302)
+			auth.LoginMsgs.LoginRequired = true
 			return
+		}
 
-		} else if err != nil {
+		userid, err := query.GetUserID(db, r)
+		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}

@@ -47,9 +47,7 @@ func AddComment(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		cookie, _ := r.Cookie("session")
-
-		userid, err := query.GetUserID(db, cookie.Value)
+		userid, err := query.GetUserID(db, r)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return

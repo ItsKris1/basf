@@ -64,7 +64,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 		} else if r.Method == "GET" { // If the method is GET
 
 			// allTags is for displaying all the possible tags while creating the post
-			allTags, err := GetAllTags(db)
+			allTags, err := query.GetAllTags(db)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -83,6 +83,30 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 		}
 
 	}
+
+}
+
+/*
+1. Get the ID of the user by using UUID from the cookie
+2. Add the post title, body and ID of the user into Posts table
+*/
+func addPost(db *sql.DB, r *http.Request) error {
+	// We use cookie to get the ID of the user who created the post
+
+	userid, err := query.GetUserID(db, r)
+	if err != nil {
+		return err
+	}
+
+	// Add new post to database
+	stmt, err := db.Prepare("INSERT INTO posts (title, body, userid, creation_date) VALUES (?, ?, ?, ?)")
+	if err != nil {
+		return err
+	}
+
+	timeNow := time.Now()
+	stmt.Exec(r.FormValue("title"), r.FormValue("body"), userid, timeNow.Format(time.ANSIC))
+	return nil
 
 }
 
@@ -137,59 +161,4 @@ func addPostTags(db *sql.DB, r *http.Request) error {
 	}
 
 	return nil
-}
-
-/*
-1. Get the ID of the user by using UUID from the cookie
-2. Add the post title, body and ID of the user into Posts table
-*/
-func addPost(db *sql.DB, r *http.Request) error {
-	// We use cookie to get the ID of the user who created the post
-	cookie, err := r.Cookie("session")
-	if err != nil {
-		return err
-	}
-
-	userid, err := query.GetUserID(db, cookie.Value)
-	if err != nil {
-		return err
-	}
-
-	// Add new post to database
-	stmt, err := db.Prepare("INSERT INTO posts (title, body, userid, creation_date) VALUES (?, ?, ?, ?)")
-	if err != nil {
-		return err
-	}
-
-	timeNow := time.Now()
-	stmt.Exec(r.FormValue("title"), r.FormValue("body"), userid, timeNow.Format(time.ANSIC))
-	return nil
-
-}
-
-func GetAllTags(db *sql.DB) ([]string, error) {
-	rows, err := db.Query("SELECT name FROM tags")
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	var allTags []string
-
-	for rows.Next() {
-
-		var tag string
-		if err := rows.Scan(&tag); err != nil {
-			return allTags, err
-		}
-
-		allTags = append(allTags, tag)
-	}
-
-	if err = rows.Err(); err != nil {
-		return allTags, err
-	}
-
-	return allTags, nil
 }

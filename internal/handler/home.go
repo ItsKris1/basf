@@ -44,7 +44,7 @@ func Home(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		tags, err := GetAllTags(env.DB) // function is in createpost.go (line 167)
+		tags, err := query.GetAllTags(env.DB)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return

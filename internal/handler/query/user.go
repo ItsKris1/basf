@@ -1,9 +1,16 @@
 package query
 
-import "database/sql"
+import (
+	"database/sql"
+	"net/http"
+)
 
-func GetUserID(db *sql.DB, cookieVal string) (int, error) {
-	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookieVal)
+func GetUserID(db *sql.DB, r *http.Request) (int, error) {
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		return 0, err
+	}
+	row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
 
 	var userid int
 	if err := row.Scan(&userid); err != nil {

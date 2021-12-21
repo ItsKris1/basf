@@ -38,12 +38,12 @@ func RegisterAuth(env *env.Env) http.HandlerFunc {
 		db := env.DB
 		invalidInput := false // Checks if the credentials that user wrote are valid
 
-		if RowExists("SELECT username FROM users WHERE username = ?", username, db) { // if the username exists
+		if rowExists("SELECT username FROM users WHERE username = ?", username, db) { // if the username exists
 			RegMsgs.TakenUn = true
 			invalidInput = true
 		}
 
-		if RowExists("SELECT email from USERS WHERE email = ?", email, db) { // if the email exists
+		if rowExists("SELECT email from USERS WHERE email = ?", email, db) { // if the email exists
 			RegMsgs.TakenEmail = true
 			invalidInput = true
 		}
@@ -56,7 +56,7 @@ func RegisterAuth(env *env.Env) http.HandlerFunc {
 		if !invalidInput {
 
 			password1, _ := hash.Password(password1)
-			AddUser(username, password1, email, db) // add user to the database
+			addUser(username, password1, email, db) // add user to the database
 
 			LoginMsgs.SuccesfulRegister = true // This is to tell user on login page whether their registration was succesful
 			http.Redirect(w, r, "/login", 302)
@@ -69,7 +69,7 @@ func RegisterAuth(env *env.Env) http.HandlerFunc {
 	}
 }
 
-func AddUser(username, password, email string, db *sql.DB) {
+func addUser(username, password, email string, db *sql.DB) {
 	stmt, err := db.Prepare("INSERT INTO users (username, password, email) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
@@ -77,7 +77,7 @@ func AddUser(username, password, email string, db *sql.DB) {
 	stmt.Exec(username, password, email)
 }
 
-func RowExists(q string, value string, db *sql.DB) bool {
+func rowExists(q string, value string, db *sql.DB) bool {
 	row := db.QueryRow(q, value)
 
 	switch err := row.Scan(&value); err {

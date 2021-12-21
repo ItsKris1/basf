@@ -41,7 +41,7 @@ func Search(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		allTags, err := GetAllTags(env.DB)
+		allTags, err := query.GetAllTags(env.DB)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return

@@ -54,8 +54,8 @@ func GetTags(db *sql.DB, postid int) ([]string, error) {
 			}
 		}
 
-		tagname, err := getTagName(db, tagid)
-		if err != nil {
+		var tagname string
+		if err := db.QueryRow("SELECT name FROM tags WHERE id = ?", tagid).Scan(&tagname); err != nil {
 			return tags, err
 		}
 
@@ -69,13 +69,3 @@ func GetTags(db *sql.DB, postid int) ([]string, error) {
 	return tags, err
 }
 
-func getTagName(db *sql.DB, tagid string) (string, error) {
-	var tagname string
-
-	if err := db.QueryRow("SELECT name FROM tags WHERE id = ?", tagid).Scan(&tagname); err != nil {
-		return "", err
-	}
-
-	return tagname, nil
-
-}
