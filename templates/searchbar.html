@@ -4,11 +4,29 @@
     <select id="bap" class="select2" style="width: 100%;" name="tags">
         {{ range .AllTags}}
         <option value="{{.}}">{{.}}</option>
+        <option value="s">s</option>
+        <option value="s">s</option>
+        <option value="s">s</option>
+
         {{end}}
+        <option value="s">s</option>
+        <option value="s">s</option>
+        <option value="s">s</option>
     </select>
     <button type="submit" class="btn btn-primary btn-sm" id="searchbtn">Search</button>
 
 </form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+
+
+</script>
+
 
 
 {{ end}}
