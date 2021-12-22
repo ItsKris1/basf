@@ -40,32 +40,26 @@ input:-webkit-autofill:active {
 input:-webkit-autofill {
   -webkit-text-fill-color: white !important;
 }
-/* END */
+/* Autocomplete input background END */
 
-/* -------- */
 /* Select 2 with single option*/
-
-/* Removes border from hidden input behind the container */
+/* Input container */
 .select2-container--default .select2-selection--single {
-  border: none !important;
-}
-
-span.selection .select2-selection.select2-selection--multiple {
   background-color: var(--form-color) !important;
-  color: white;
   border: var(--form-border);
+  color: white;
 }
 
-#bap + .select2 .select2-selection__rendered {
-  line-height: 30px;
-  background-color: var(--form-color) !important;
-  color: white;
-  border: var(--form-border);
-}
-
+/* Hovering over otion */
 .select2-results__option--highlighted {
   background-color: rgb(61, 76, 99) !important;
 }
+
+/* Selected option */
+.select2-results__option--selected {
+  background-color: rgb(65, 124, 124) !important;
+}
+
 /* Each result */
 #select2-bap-results {
   background-color: var(--select-bg) !important;
@@ -77,28 +71,33 @@ span.selection .select2-selection.select2-selection--multiple {
   background-color: var(--select-bg) !important;
 }
 
-/* Search field */
+/* Search field inside dropdown*/
 .select2-search input,
 .select2-search input:focus {
   outline: none;
   background-color: var(--form-color);
-  color: white;
-  border: var(--form-border);
+  color: white !important;
+  border: var(--form-border) !important;
 }
-/* Selected option */
-.select2-results__option--selected {
-  background-color: rgb(65, 124, 124) !important;
+
+.select2-selection__rendered {
+  color: white !important ;
 }
 
 /* Select 2 with single option END */
-/* -------- */
 
-/* Select 2 with multiple options*/
+/* Input with multiple options */
+span.selection .select2-selection.select2-selection--multiple {
+  background-color: var(--form-color) !important;
+  color: white !important;
+  border: var(--form-border);
+}
 
+/* Multiple options in input (tags) */
 #select2-bap2-container li.select2-selection__choice {
-  background-color: black !important;
-  color: wheat;
-  border: tomato;
+  background-color: #3a3f46 !important;
+  color: rgb(214, 203, 203);
+  border: var(--form-border);
 }
 
 /* Removes weird background from selected item in input */
@@ -106,7 +105,18 @@ span.selection .select2-selection.select2-selection--multiple {
   background-color: var(--form-color) !important;
 }
 
-/* END */
+button.select2-selection__choice__remove {
+  border-right: var(--form-color) !important;
+}
+
+button.select2-selection__choice__remove:hover {
+  background-color: #59606b !important;
+}
+
+.select2-search__field {
+  color: white !important;
+}
+/* Select 2 with multiple options END */
 
 @media only screen and (min-width: 600px) {
   #viewpost-container {
