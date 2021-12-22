@@ -34,7 +34,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px var(--form-border) !important;
+  -webkit-box-shadow: 0 0 0 30px #434950 inset !important;
 }
 
 input:-webkit-autofill {
@@ -45,39 +45,36 @@ input:-webkit-autofill {
 /* -------- */
 /* Select 2 with single option*/
 
-/* Input field */
+/* Removes border from hidden input behind the container */
 .select2-container--default .select2-selection--single {
   border: none !important;
 }
 
-.select2-selection.select2-selection--single,
-#bap + .select2 .select2-selection__rendered {
+span.selection .select2-selection.select2-selection--multiple {
   background-color: var(--form-color) !important;
   color: white;
   border: var(--form-border);
 }
 
-/* Higlighted (hover) result */
-#select2-bap-results .select2-results__option--highlighted {
-  background-color: rgb(5, 27, 27) !important;
+#bap + .select2 .select2-selection__rendered {
+  line-height: 30px;
+  background-color: var(--form-color) !important;
+  color: white;
+  border: var(--form-border);
 }
 
-/* Selected option */
-#select2-bap-results .select2-results__option[aria-selected="true"] {
+.select2-results__option--highlighted {
   background-color: rgb(61, 76, 99) !important;
 }
-
 /* Each result */
 #select2-bap-results {
   background-color: var(--select-bg) !important;
 }
-/* Around the search field */
-.select2-search {
-  background-color: var(--select-bg) !important;
-}
+
 /* Dropdown */
 .select2-container--open .select2-dropdown {
   border: var(--form-border);
+  background-color: var(--select-bg) !important;
 }
 
 /* Search field */
@@ -89,25 +86,26 @@ input:-webkit-autofill {
   border: var(--form-border);
 }
 /* Selected option */
-#select2-bap-results .select2-results__option--selected {
+.select2-results__option--selected {
   background-color: rgb(65, 124, 124) !important;
 }
+
+/* Select 2 with single option END */
 /* -------- */
+
 /* Select 2 with multiple options*/
-span.selection > span.select2-selection.select2-selection--multiple {
-  background-color: var(--form-color) !important;
-  border: var(--form-border) !important;
+
+#select2-bap2-container li.select2-selection__choice {
+  background-color: black !important;
+  color: wheat;
+  border: tomato;
 }
 
-.select2-selection.select2-selection--single,
-#bap2 + .select2 .select2-selection__rendered {
-  background-color: var(--form-color) !important;
-  color: white;
-}
-
+/* Removes weird background from selected item in input */
 .select2-search.select2-search--inline {
   background-color: var(--form-color) !important;
 }
+
 /* END */
 
 @media only screen and (min-width: 600px) {
