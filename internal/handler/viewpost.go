@@ -4,26 +4,16 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/query"
+	"forum/internal/handler/structs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
 )
 
-type Comment struct {
-	ID           string
-	Body         string
-	PostID       int
-	UserID       int
-	Username     string
-	CreationDate string
-	Likes        string
-	Dislikes     string
-}
-
 type ViewPostPage struct {
-	Post     Post // Post struct is in home.go
-	Comments []Comment
-	UserInfo session.User
+	Post     structs.Post // Post struct is in home.go
+	Comments []structs.Comment
+	UserInfo structs.User
 }
 
 func ViewPost(env *env.Env) http.HandlerFunc {
@@ -43,7 +33,7 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 		postid := r.URL.Query().Get("id") // Get the id of the post from the URL
 		row := db.QueryRow("SELECT * FROM posts WHERE postid = ?", postid)
 
-		post := Post{}
+		post := structs.Post{}
 
 		// Load all that post data to struct from database
 		var userid int
@@ -87,7 +77,7 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 	}
 }
 
-func postComments(db *sql.DB, postid string) ([]Comment, error) {
+func postComments(db *sql.DB, postid string) ([]structs.Comment, error) {
 
 	rows, err := db.Query("SELECT id, body, postid, userid, creation_date FROM comments where postid = ?", postid)
 	if err != nil {
@@ -96,9 +86,9 @@ func postComments(db *sql.DB, postid string) ([]Comment, error) {
 
 	defer rows.Close()
 
-	var comments []Comment
+	var comments []structs.Comment
 	for rows.Next() {
-		var comment Comment
+		var comment structs.Comment
 
 		if err := rows.Scan(&comment.ID, &comment.Body, &comment.PostID, &comment.UserID, &comment.CreationDate); err != nil {
 			return comments, err
@@ -125,7 +115,7 @@ func postComments(db *sql.DB, postid string) ([]Comment, error) {
 	return comments, nil
 }
 
-func addCommentLikes(db *sql.DB, comment Comment) (Comment, error) {
+func addCommentLikes(db *sql.DB, comment structs.Comment) (structs.Comment, error) {
 	var res int
 
 	// Check if post has any likes or dislikes

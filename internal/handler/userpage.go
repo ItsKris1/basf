@@ -5,15 +5,16 @@ import (
 	"forum/internal/env"
 	"forum/internal/handler/auth"
 	"forum/internal/handler/query"
+	"forum/internal/handler/structs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
 )
 
 type UserPage struct {
-	UserInfo     session.User
-	LikedPosts   []Post
-	CreatedPosts []Post
+	UserInfo     structs.User
+	LikedPosts   []structs.Post
+	CreatedPosts []structs.Post
 }
 
 func UserDetails(env *env.Env) http.HandlerFunc {
@@ -63,17 +64,17 @@ func UserDetails(env *env.Env) http.HandlerFunc {
 	}
 }
 
-func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
+func userLikedPosts(db *sql.DB, userid string) ([]structs.Post, error) {
 	rows, err := db.Query("SELECT postid FROM postlikes WHERE userid = ? AND like = 1", userid)
 	if err != nil {
 		return nil, err
 	}
 
-	var likedPosts []Post
+	var likedPosts []structs.Post
 
 	for rows.Next() {
 		var postid int
-		var post Post
+		var post structs.Post
 
 		if err := rows.Scan(&postid); err != nil {
 			return likedPosts, err
@@ -113,17 +114,17 @@ func userLikedPosts(db *sql.DB, userid string) ([]Post, error) {
 	return likedPosts, nil
 }
 
-func userCreatedPosts(db *sql.DB, userid string) ([]Post, error) {
+func userCreatedPosts(db *sql.DB, userid string) ([]structs.Post, error) {
 	rows, err := db.Query("SELECT postid, title, body, creation_date FROM posts WHERE userid = ?", userid)
 	if err != nil {
 		return nil, err
 	}
 
-	var createdPosts []Post
+	var createdPosts []structs.Post
 
 	for rows.Next() {
 
-		var post Post
+		var post structs.Post
 		if err := rows.Scan(&post.ID, &post.Title, &post.Body, &post.CreationDate); err != nil {
 			return createdPosts, err
 		}

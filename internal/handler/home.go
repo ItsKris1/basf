@@ -4,25 +4,15 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/query"
+	"forum/internal/handler/structs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
 )
 
-type Post struct {
-	ID           int
-	Username     string
-	Title        string
-	Body         string
-	CreationDate string
-	Tags         []string
-	LikeCount    int
-	DislikeCount int
-}
-
 type HomePage struct {
-	UserInfo session.User
-	AllPosts []Post
+	UserInfo structs.User
+	AllPosts []structs.Post
 	AllTags  []string
 }
 
@@ -61,7 +51,7 @@ func Home(env *env.Env) http.HandlerFunc {
 	}
 }
 
-func allPosts(db *sql.DB) ([]Post, error) {
+func allPosts(db *sql.DB) ([]structs.Post, error) {
 
 	rows, err := db.Query("SELECT * FROM posts")
 	if err != nil {
@@ -70,9 +60,9 @@ func allPosts(db *sql.DB) ([]Post, error) {
 
 	defer rows.Close()
 
-	var posts []Post
+	var posts []structs.Post
 	for rows.Next() {
-		var post Post
+		var post structs.Post
 		var userid int
 
 		if err := rows.Scan(&post.ID, &userid, &post.Title, &post.Body, &post.CreationDate); err != nil {

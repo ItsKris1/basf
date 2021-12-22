@@ -3,18 +3,13 @@ package auth
 import (
 	"database/sql"
 	"forum/internal/env"
+	"forum/internal/handler/structs"
 	"forum/internal/hash"
 	"log"
 	"net/http"
 )
 
-type RegisterMessages struct {
-	TakenUn     bool // taken username
-	TakenEmail  bool // taken email
-	PswrdsNotEq bool // user typed passwords dont match
-}
-
-var RegMsgs RegisterMessages
+var RegMsgs structs.RegisterMessages
 
 func RegisterAuth(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

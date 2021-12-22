@@ -4,19 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/env"
+	"forum/internal/handler/structs"
 	"forum/internal/hash"
 	"forum/internal/session"
 	"net/http"
 )
 
-type LoginMessages struct {
-	NotFound          bool
-	WrongPassword     bool
-	SuccesfulRegister bool // Displays message on login screen after succesful registration
-	LoginRequired     bool
-}
-
-var LoginMsgs LoginMessages
+var LoginMsgs structs.LoginMessages
 
 func LoginAuth(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

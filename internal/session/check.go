@@ -2,16 +2,12 @@ package session
 
 import (
 	"database/sql"
+	"forum/internal/handler/structs"
 	"net/http"
 	"time"
 )
 
-type User struct {
-	ID       int    // ID is for tracking, which user is having a session
-	Username string // Display the name of the user who is logged in
-}
-
-var UserInfo User
+var UserInfo structs.User
 
 func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) (bool, error) {
 	cookie, err := r.Cookie("session")

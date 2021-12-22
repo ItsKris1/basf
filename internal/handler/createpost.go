@@ -5,6 +5,7 @@ import (
 	"forum/internal/env"
 	"forum/internal/handler/auth"
 	"forum/internal/handler/query"
+	"forum/internal/handler/structs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 
 // "createpost.html" uses "base" template, which has a navbar what uses data from UserInfo
 type CreatePostPage struct {
-	UserInfo session.User
+	UserInfo structs.User
 	Tags     []string
 }
 

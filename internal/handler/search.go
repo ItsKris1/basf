@@ -4,15 +4,16 @@ import (
 	"database/sql"
 	"forum/internal/env"
 	"forum/internal/handler/query"
+	"forum/internal/handler/structs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
 )
 
 type SearchResultsPage struct {
-	UserInfo session.User
+	UserInfo structs.User
 	AllTags  []string // For the search box in search results page
-	Results  []Post
+	Results  []structs.Post
 }
 
 func Search(env *env.Env) http.HandlerFunc {
@@ -57,15 +58,15 @@ func Search(env *env.Env) http.HandlerFunc {
 	}
 }
 
-func getPosts(db *sql.DB, tagid string) ([]Post, error) {
+func getPosts(db *sql.DB, tagid string) ([]structs.Post, error) {
 	rows, err := db.Query("SELECT postid FROM posttags WHERE tagid = ?", tagid)
 	if err != nil {
 		return nil, err
 	}
 
-	var results []Post
+	var results []structs.Post
 	for rows.Next() {
-		var post Post
+		var post structs.Post
 
 		var postid string
 		if err := rows.Scan(&postid); err != nil {

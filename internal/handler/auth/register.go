@@ -1,14 +1,15 @@
 package auth
 
 import (
+	"forum/internal/handler/structs"
 	"forum/internal/session"
 	"forum/internal/tpl"
 	"net/http"
 )
 
 type RegisterPage struct {
-	RegMsgs  RegisterMessages
-	UserInfo session.User
+	RegMsgs  structs.RegisterMessages
+	UserInfo structs.User
 }
 
 func Register() http.HandlerFunc {
@@ -20,7 +21,7 @@ func Register() http.HandlerFunc {
 
 		tpl.RenderTemplates(w, "register.html", registerPage, "./templates/auth/register.html", "./templates/base.html")
 
-		RegMsgs = RegisterMessages{} // Reset the login messages or they wont change upon reloading the page
+		RegMsgs = structs.RegisterMessages{} // Reset the login messages or they wont change upon reloading the page
 	}
 
 }
