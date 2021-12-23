@@ -75,7 +75,7 @@ func CreatePost(env *env.Env) http.HandlerFunc {
 				Tags:     allTags,
 			}
 
-			tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/posts/createpost.html", "./templates/base.html")
+			tpl.RenderTemplates(w, "createpost.html", createPostPage, "./templates/createpost.html", "./templates/base.html")
 			return
 
 		} else {

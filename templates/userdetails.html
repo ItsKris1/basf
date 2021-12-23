@@ -1,12 +1,17 @@
 {{ template "base" .}}
 {{ define "content" }}
 
-<style>
-    .col-6 {}
-</style>
 
 <div class="container">
     <div class="row">
+        {{ if and (not .LikedPosts) (not .CreatedPosts)}}
+        <div class="col-6-lg col-md d-flex justify-content-center mt-5">
+            <h2>You dont have any liked or created posts</h2>
+
+        </div>
+
+        {{ end }}
+        {{ if .LikedPosts}}
         <div class="col-6-lg col-md">
             <div class="card w-100">
                 <div class="card-header d-flex justify-content-between">
@@ -42,6 +47,9 @@
                 </ul>
             </div>
         </div>
+        {{ end }}
+
+        {{ if .CreatedPosts }}
         <div class="col-6-lg col-md">
             <div class="card w-100">
                 <div class="card-header d-flex justify-content-between">
@@ -74,8 +82,8 @@
 
                 </ul>
             </div>
-
         </div>
+        {{ end }}
     </div>
 
 </div>

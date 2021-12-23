@@ -2,6 +2,7 @@
   --form-color: #434950;
   --select-bg: #3a3f44;
   --form-border: 1px solid rgb(97, 92, 92);
+  --placholder-color: rgb(172, 172, 172);
 }
 
 body {
@@ -43,7 +44,8 @@ input:-webkit-autofill {
 /* Autocomplete input background END */
 
 /* Select 2 with single option*/
-/* Input container */
+
+/* Select element */
 .select2-container--default .select2-selection--single {
   background-color: var(--form-color) !important;
   border: var(--form-border);
@@ -84,13 +86,27 @@ input:-webkit-autofill {
   color: white !important ;
 }
 
+.select2-selection__placeholder {
+  color: var(--placholder-color) !important;
+}
+
+
 /* Select 2 with single option END */
+
+/* Select 2 with multiple options END */
 
 /* Input with multiple options */
 span.selection .select2-selection.select2-selection--multiple {
   background-color: var(--form-color) !important;
-  color: white !important;
   border: var(--form-border);
+}
+
+span.selection .select2-selection.select2-selection--multiple:focus-within {
+  box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%) !important;
+}
+
+.select2-search__field {
+  color: white !important;
 }
 
 /* Multiple options in input (tags) */
@@ -100,22 +116,21 @@ span.selection .select2-selection.select2-selection--multiple {
   border: var(--form-border);
 }
 
-/* Removes weird background from selected item in input */
+/* Removes weird background from input (tags) */
 .select2-search.select2-search--inline {
   background-color: var(--form-color) !important;
 }
 
+/* Button for the tags */
 button.select2-selection__choice__remove {
   border-right: var(--form-color) !important;
 }
 
+/* Hover statea for the button for the tags */
 button.select2-selection__choice__remove:hover {
   background-color: #59606b !important;
 }
 
-.select2-search__field {
-  color: white !important;
-}
 /* Select 2 with multiple options END */
 
 @media only screen and (min-width: 600px) {
