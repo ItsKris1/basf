@@ -3,19 +3,19 @@
 {{define "content"}}
 
 
-<div class="container w-50 my-3 d-flex flex-column align-items-end gap-5 ">
+<div class="container w-50 my-5 d-flex flex-column align-items-end gap-5 ">
     {{ if not .AllPosts}}
     <a class="btn btn-sm btn-secondary " href="/createpost" role="button">Create a post</a>
     {{ else }}
-    <div class="card w-100">
+    <div class="card card-bg shadow w-100">
         <div class="card-header d-flex justify-content-between">
             <span class="align-self-center">Featured</span> <a class="btn btn-sm btn-secondary " href="/createpost"
                 role="button">Create a post</a>
         </div>
-        <ul class="list-group list-group-flush">
+        <ul class="list-group list-group-flush ">
             {{ range $post := .AllPosts }}
 
-            <li class="list-group-item">
+            <li class="list-group-item card-bg">
                 <p class="card-text "><a href="/post?id={{$post.ID}}">{{$post.Title}}</a>
                 </p>
 

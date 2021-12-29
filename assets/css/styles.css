@@ -18,11 +18,11 @@ body {
 input[type="search"].form-control {
   background-color: rgb(54, 57, 66);
 }
-.card,
-.list-group-item {
-  border-radius: 0.35rem;
+
+.card-bg {
   background-color: #2e3a40;
 }
+
 .card-header {
   background-color: #374c56;
 }
@@ -88,6 +88,7 @@ input:-webkit-autofill {
 
 .select2-selection__placeholder {
   color: var(--lg-white) !important;
+  font-size: 0.95rem !important;
 }
 
 /* Select 2 with single option END */

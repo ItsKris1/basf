@@ -2,7 +2,7 @@
 {{ define "content" }}
 
 
-<div class="container">
+<div class="container mt-5">
     <div class="row">
         {{ if and (not .LikedPosts) (not .CreatedPosts)}}
         <div class="col-6-lg col-md d-flex justify-content-center mt-5">
@@ -13,7 +13,7 @@
 
 
         {{ if .LikedPosts}}
-        <div class="col-10 col-lg-6 mx-auto mt-5">
+        <div class="col-10 col-lg-6 mx-auto mb-5">
             <div class="card w-100">
                 <div class="card-header d-flex justify-content-between">
                     <span class="align-self-center">Liked posts</span>
@@ -51,7 +51,7 @@
         {{ end }}
         <div class="w-100"></div>
         {{ if .CreatedPosts }}
-        <div class="col-10 col-lg-6 mx-auto mt-5">
+        <div class="col-10 col-lg-6 mx-auto mb-5">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <span class="align-self-center">Created posts</span>
