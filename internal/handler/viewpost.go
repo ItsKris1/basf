@@ -48,14 +48,14 @@ func ViewPost(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		count, err := query.GetLikesDislike(db, post.ID)
+		reactCount, err := query.GetLikesDislike(db, post.ID)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		post.LikeCount = count.Dislikes
-		post.DislikeCount = count.Likes
+		post.LikeCount = reactCount.Likes
+		post.DislikeCount = reactCount.Dislikes
 		post.Username = username
 
 		// Get the comments for that post

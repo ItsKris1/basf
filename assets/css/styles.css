@@ -2,7 +2,7 @@
   --form-color: #434950;
   --select-bg: #3a3f44;
   --form-border: 1px solid rgb(97, 92, 92);
-  --placholder-color: rgb(172, 172, 172);
+  --lg-white: rgb(214, 207, 207);
 }
 
 body {
@@ -11,7 +11,7 @@ body {
 .form-control,
 .form-control:focus {
   background-color: var(--form-color);
-  color: white;
+  color: var(--lg-white);
   border: var(--form-border);
 }
 
@@ -87,9 +87,8 @@ input:-webkit-autofill {
 }
 
 .select2-selection__placeholder {
-  color: var(--placholder-color) !important;
+  color: var(--lg-white) !important;
 }
-
 
 /* Select 2 with single option END */
 
@@ -112,7 +111,7 @@ span.selection .select2-selection.select2-selection--multiple:focus-within {
 /* Multiple options in input (tags) */
 #select2-bap2-container li.select2-selection__choice {
   background-color: #3a3f46 !important;
-  color: rgb(214, 203, 203);
+  color: var(--lg-white);
   border: var(--form-border);
 }
 

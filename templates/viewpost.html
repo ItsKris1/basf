@@ -32,10 +32,10 @@
 
 
                         <div class="likes d-inline-block float-end">
-                            <a class="btn btn-sm btn-success" href="/like?post={{ .Post.ID }}" role="button">
+                            <a class="btn btn-sm btn-success" href="/react?like=true&post={{ .Post.ID }}" role="button">
                                 <span>{{.Post.LikeCount}}</span> Like</a>
 
-                            <a class="btn btn-sm btn-danger" href="/dislike?post={{ .Post.ID }}" role="button">
+                            <a class="btn btn-sm btn-danger" href="/react?like=false&post={{ .Post.ID }}" role="button">
                                 <span>{{.Post.DislikeCount}}</span> Dislike</a>
 
                         </div>
@@ -68,9 +68,9 @@
                         </p>
 
                         <div class="likes d-inline-block float-end">
-                            <a class="btn btn-sm btn-success " href="/like?comment={{ .ID }}" role="button">
+                            <a class="btn btn-sm btn-success " href="/react?like=true&comment={{ .ID }}" role="button">
                                 <span>{{.Likes}}</span> Like</a>
-                            <a class="btn btn-sm btn-danger" href="/dislike?comment={{ .ID }}"
+                            <a class="btn btn-sm btn-danger" href="/react?like=false&comment={{ .ID }}"
                                 role="button"><span>{{.Dislikes}}</span>
                                 Dislike</a>
                         </div>

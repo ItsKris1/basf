@@ -8,7 +8,12 @@ import (
 	"net/http"
 )
 
-func Like(env *env.Env) http.HandlerFunc {
+/*
+	Reacting to a post or comment:
+	Upon reacting it will sent to an url, where you will have a "like" and "post" or "commentid" query
+*/
+
+func React(env *env.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		db := env.DB
 		isLogged, err := session.Check(db, w, r)
@@ -29,13 +34,17 @@ func Like(env *env.Env) http.HandlerFunc {
 			return
 		}
 
-		/*
-			Liking or disliking a post will put the post id to url
-			Liking or disliking a comment will put the comment id to url
-		*/
+		var isLike int // 1 means user liked the post and 0 means user disliked
+
+		like := r.URL.Query().Get("like") // Get the value of the "like" to see if user liked or disliked
+		if like == "true" {
+			isLike = 1
+		}
+
 		commentid := r.URL.Query().Get("comment")
 		postid := r.URL.Query().Get("post")
 
+		// User reacted to a comment because there is a commentid in url
 		if commentid != "" {
 			// CheckQuery checks if the id from URL is valid and exists
 			if err := query.CheckURLQuery(db, "SELECT id FROM comments WHERE id = ?", commentid); err != nil {
@@ -43,7 +52,7 @@ func Like(env *env.Env) http.HandlerFunc {
 				return
 			}
 
-			err = query.CheckCommentLikes(db, userid, commentid, 1)
+			err = query.CheckCommentLikes(db, userid, commentid, isLike)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -55,6 +64,7 @@ func Like(env *env.Env) http.HandlerFunc {
 				return
 			}
 
+			// User reacted to a post because there is a postid in url
 		} else if postid != "" {
 			// CheckQuery checks if the id from URL is valid and exists
 			if err := query.CheckURLQuery(db, "SELECT postid FROM posts WHERE postid = ?", postid); err != nil {
@@ -62,7 +72,7 @@ func Like(env *env.Env) http.HandlerFunc {
 				return
 			}
 
-			err = query.CheckPostLikes(db, postid, userid, 1)
+			err = query.CheckPostLikes(db, postid, userid, isLike)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return

@@ -68,4 +68,3 @@ func GetTags(db *sql.DB, postid int) ([]string, error) {
 
 	return tags, err
 }
-
