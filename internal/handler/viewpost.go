@@ -123,7 +123,7 @@ func addCommentLikes(db *sql.DB, comment structs.Comment) (structs.Comment, erro
 
 		q := "SELECT COUNT(like) FROM commentlikes WHERE like = ? AND commentid = ?"
 
-		var dislikes string
+		var dislikes int
 		if err := db.QueryRow(q, 0, comment.ID).Scan(&dislikes); err == nil {
 			comment.Dislikes = dislikes
 
@@ -131,7 +131,7 @@ func addCommentLikes(db *sql.DB, comment structs.Comment) (structs.Comment, erro
 			return comment, err
 		}
 
-		var likes string
+		var likes int
 		if err := db.QueryRow(q, 1, comment.ID).Scan(&likes); err == nil {
 			comment.Likes = likes
 

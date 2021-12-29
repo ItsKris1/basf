@@ -19,19 +19,14 @@
                                     {{.Post.CreationDate}}</small></p>
 
                             <div class="likes float-end">
-                                <a href="/react?like=true&post={{ .Post.ID }}"><i class="fas fa-thumbs-up"> 0</i></a>
-                                <a href="/react?like=false&post={{ .Post.ID }}"><i class="fas fa-thumbs-down">
-                                        0</i></a>
+                                <a href="/react?like=true&post={{ .Post.ID }}">
+                                    <i class="fas fa-thumbs-up"> {{.Post.LikeCount}}</i></a>
+                                <a href="/react?like=false&post={{ .Post.ID }}">
+                                    <i class="fas fa-thumbs-down"> {{.Post.DislikeCount}} </i></a>
 
                             </div>
-
-
-
-
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -58,8 +53,10 @@
                                     {{.CreationDate}}</small></p>
 
                             <div class="likes float-end">
-                                <a href="/react?like=true&comment={{ .ID }}"><i class="fas fa-thumbs-up"> 0</i></a>
-                                <a href="/react?like=false&comment={{ .ID }}"><i class="fas fa-thumbs-down"> 0</i></a>
+                                <a href="/react?like=true&comment={{ .ID }}">
+                                    <i class="fas fa-thumbs-up"> {{.Likes}}</i></a>
+                                <a href="/react?like=false&comment={{ .ID }}">
+                                    <i class="fas fa-thumbs-down"> {{.Dislikes}}</i></a>
 
                             </div>
 
@@ -95,11 +92,4 @@
 </div>
 
 
-{{.Post.Username}}
-
-
-
-{{ .Post.ID }}
-{{.Post.DislikeCount}}
-{{.Post.LikeCount}}
 {{ end}}

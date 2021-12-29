@@ -18,8 +18,8 @@ type Comment struct {
 	UserID       int
 	Username     string
 	CreationDate string
-	Likes        string
-	Dislikes     string
+	Likes        int
+	Dislikes     int
 }
 
 type User struct {
