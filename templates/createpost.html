@@ -18,7 +18,9 @@
         <div class="mt-3">
             <label for="bap2" style="margin-bottom: 0.5rem;">Tags</label>
             <select class="tags" id="bap2" multiple="multiple" name="tags">
-                
+                {{ range .Tags}}
+                <option value="{{.}}">{{.}}</option>
+                {{ end }}
             </select>
 
         </div>

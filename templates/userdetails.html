@@ -9,10 +9,11 @@
             <h2>You dont have any liked or created posts</h2>
 
         </div>
-
         {{ end }}
+
+
         {{ if .LikedPosts}}
-        <div class="col-6-lg col-md">
+        <div class="col-10 col-lg-6 mx-auto mt-5">
             <div class="card w-100">
                 <div class="card-header d-flex justify-content-between">
                     <span class="align-self-center">Liked posts</span>
@@ -48,10 +49,10 @@
             </div>
         </div>
         {{ end }}
-
+        <div class="w-100"></div>
         {{ if .CreatedPosts }}
-        <div class="col-6-lg col-md">
-            <div class="card w-100">
+        <div class="col-10 col-lg-6 mx-auto mt-5">
+            <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <span class="align-self-center">Created posts</span>
                 </div>

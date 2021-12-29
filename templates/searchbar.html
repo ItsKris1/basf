@@ -3,6 +3,9 @@
 <form action="/search" method="get" class="d-flex w-25">
     <select id="bap" class="multiple-tags" style="width: 100%;" name="tags">
         <option></option>
+        {{ range .AllTags}}
+        <option value="{{.}}">{{.}}</option>
+        {{ end }}
     </select>
 
 
