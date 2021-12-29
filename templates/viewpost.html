@@ -10,17 +10,32 @@
                         <img src="../assets/userprofile.png" class="img-fluid rounded-end" alt="...">
                         <p class="card-text text-center mt-1">{{.Post.Username}}</p>
                     </div>
-                    <div class="col-10 d-flex flex-column justify-content-between  px-4 ">
-                        <h5 class="card-title m-0">Card title</h5>
-                        <p class="card-text my-4">This is a wider card with supporting text below as a natural lead-in
-                            to
-                            additional
-                            content. This content is a little bit longer.</p>
-                        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                    <div class="col-10 d-flex flex-column justify-content-around  px-4 ">
+                        <h5 class="card-title">{{.Post.Title}}</h5>
+                        <p class="card-text">{{.Post.Body}}</p>
+
+                        <div class="c-footer">
+                            <p class="card-text d-inline-block m-0"><small class="text-muted ">Created:
+                                    {{.Post.CreationDate}}</small></p>
+
+                            <div class="likes float-end">
+                                <a href="/react?like=true&post={{ .Post.ID }}"><i class="fas fa-thumbs-up"> 0</i></a>
+                                <a href="/react?like=false&post={{ .Post.ID }}"><i class="fas fa-thumbs-down">
+                                        0</i></a>
+
+                            </div>
+
+
+
+
+                        </div>
+
                     </div>
+
                 </div>
             </div>
         </div>
+
 
 
         <div class="w-100"></div>
@@ -30,16 +45,26 @@
         <div class="col-6">
             <div class="card card-bg mb-3">
 
-                <div class="row shadow g-0 p-3">
-                    <div class="col-2">
+                <div class="row g-0 p-3 shadow">
+                    <div class="col-2 p-2">
                         <img src="../assets/userprofile.png" class="img-fluid rounded-start" alt="...">
-                        <p class="card-text text-center mt-1">kris</p>
+                        <p class="card-text text-center mt-1">{{.Username }}</p>
                     </div>
-                    <div class="col-10  d-flex flex-column justify-content-around pt-2 px-4 ">
-                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
-                            additional
-                            content. This content is a little bit longer.</p>
-                        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                    <div class="col-10 d-flex flex-column justify-content-between py-2 px-4 ">
+                        <p class="card-text mt-4">{{.Body}}</p>
+
+                        <div class="c-footer">
+                            <p class="card-text d-inline-block"><small class="text-muted ">Created:
+                                    {{.CreationDate}}</small></p>
+
+                            <div class="likes float-end">
+                                <a href="/react?like=true&comment={{ .ID }}"><i class="fas fa-thumbs-up"> 0</i></a>
+                                <a href="/react?like=false&comment={{ .ID }}"><i class="fas fa-thumbs-down"> 0</i></a>
+
+                            </div>
+
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -69,10 +94,10 @@
 </div>
 </div>
 
-{{.Post.Title}}
+
 {{.Post.Username}}
-{{.Post.Body}}
-{{.Post.CreationDate}}
+
+
 
 {{ .Post.ID }}
 {{.Post.DislikeCount}}

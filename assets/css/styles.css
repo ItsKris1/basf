@@ -30,6 +30,13 @@ input[type="search"].form-control {
   background-color: rgb(43, 39, 39);
 }
 
+.fa-thumbs-up {
+  color: green;
+}
+.fa-thumbs-up:hover {
+  color: black;
+}
+
 /* Change autocomplete input background color */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -90,10 +97,9 @@ input:-webkit-autofill {
   color: var(--lg-white) !important;
   font-size: 0.95rem !important;
 }
-
 /* Select 2 with single option END */
 
-/* Select 2 with multiple options END */
+/* Select 2 with multiple options  */
 
 /* Input with multiple options */
 span.selection .select2-selection.select2-selection--multiple {
