@@ -3,7 +3,7 @@
 
 <div class="container mt-5">
     <div class="row gap-3 justify-content-center">
-        <div class="col-6 mb-3">
+        <div class="col-10 col-lg-6 mb-3">
             <div class="card shadow card-bg">
                 <div class="row g-0 p-4">
                     <div class="col-2 d-flex flex-column justify-content-center">
@@ -37,7 +37,7 @@
 
         {{ range .Comments }}
 
-        <div class="col-6">
+        <div class="col-10 col-lg-6">
             <div class="card card-bg mb-3">
 
                 <div class="row g-0 p-3 shadow">
@@ -45,7 +45,7 @@
                         <img src="../assets/userprofile.png" class="img-fluid rounded-start" alt="...">
                         <p class="card-text text-center mt-1">{{.Username }}</p>
                     </div>
-                    <div class="col-10 d-flex flex-column justify-content-between py-2 px-4 ">
+                    <div class="col-10 col-md-10 d-flex flex-column justify-content-between py-2 px-4 ">
                         <p class="card-text mt-4">{{.Body}}</p>
 
                         <div class="c-footer">
@@ -70,7 +70,7 @@
         {{ end }}
         <div class="w-100"></div>
         <div class="row justify-content-center">
-            <div class="col-6">
+            <div class="col-6 col-md-6">
                 <div class="row justify-content-end">
                     <div class="col-8">
                         <form action="/addcomment?post={{.Post.ID}}" method="post">
