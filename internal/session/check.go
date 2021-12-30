@@ -2,6 +2,7 @@ package session
 
 import (
 	"database/sql"
+	"forum/internal/handler/query"
 	"forum/internal/handler/structs"
 	"net/http"
 	"time"
@@ -13,40 +14,39 @@ func Check(db *sql.DB, w http.ResponseWriter, r *http.Request) (bool, error) {
 	cookie, err := r.Cookie("session")
 
 	if err != nil {
-		// delete the expired session from db
-		stmt, err := db.Prepare("DELETE FROM sessions WHERE userid = ?")
-		if err != nil {
-			if err != sql.ErrNoRows {
-				return false, err
-			}
+		if err == http.ErrNoCookie { // If there isnt an existing cookie, there isnt an ongoing session
+			UserInfo.Logged = false // 0 means no user is logged in
+			return false, nil
 		}
-		stmt.Exec(UserInfo.ID)
-		UserInfo.ID = 0 // Resets the UserID if there is no ongoing session
 
 		return false, err
 
+		// If cookie exists, get the UserID of the cookie and update the UserInfo.ID(which tracks, what is the logged in user ID)
 	} else {
 		// Check if that cookie belongs to user
 		row := db.QueryRow("SELECT userid FROM sessions WHERE uuid = ?", cookie.Value)
 
-		if err := row.Scan(&UserInfo.ID); err != nil { // If it wont find who the cookie belongs to - it deletes it
+		if err := row.Scan(&UserInfo.ID); err != nil {
+			// If it wont find who the cookie belongs to - it deletes it
 			if err == sql.ErrNoRows {
 				cookie.Expires = time.Unix(0, 0)
 				http.SetCookie(w, cookie)
 
-				UserInfo.ID = 0   // Resets the UserID if there is no ongoing session
-				return false, nil // Return nil because the error is handled
+				UserInfo.Logged = false // Resets the UserID if there is no ongoing session
+				return false, nil       // Return nil because the error is handled
 			}
 
 			return false, err
 		}
 
 		// Get the logged in user's Username
-		row = db.QueryRow("SELECT username FROM users WHERE id = ?", UserInfo.ID)
-
-		if err := row.Scan(&UserInfo.Username); err != nil {
+		username, err := query.GetUsername(db, UserInfo.ID)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
 			return false, err
 		}
+		UserInfo.Username = username
+		UserInfo.Logged = true
 
 		return true, err
 	}

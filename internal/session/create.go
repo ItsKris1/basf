@@ -11,7 +11,7 @@ import (
 func Create(userid int, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	cookie, err := r.Cookie("session")
 
-	if err != nil { // If cookie doesnt exist, we are making a new one
+	if err != nil {
 		if err != http.ErrNoCookie {
 			http.Error(w, err.Error(), 500)
 			return

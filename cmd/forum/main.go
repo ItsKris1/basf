@@ -19,6 +19,18 @@ func main() {
 	// Makes an environment for Database connection
 	env := &env.Env{DB: db}
 
+	// One crate statement for the audit
+	stmt, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "postlikes" (
+	"postid"	INTEGER NOT NULL,
+	"userid"	INTEGER NOT NULL,
+	"like"	INTEGER NOT NULL,
+	FOREIGN KEY("postid") REFERENCES "posts"("postid") ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY("userid") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY("userid","postid")
+);`)
+
+	stmt.Exec()
+
 	http.HandleFunc("/", handler.Home(env))
 	http.HandleFunc("/createpost", handler.CreatePost(env))
 	http.HandleFunc("/post", handler.ViewPost(env))

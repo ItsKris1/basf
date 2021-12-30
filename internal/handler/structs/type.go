@@ -25,6 +25,7 @@ type Comment struct {
 type User struct {
 	ID       int    // ID is for tracking, which user is having a session
 	Username string // Display the name of the user who is logged in
+	Logged   bool
 }
 
 type LoginMessages struct {

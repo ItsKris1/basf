@@ -27,7 +27,7 @@
 
   <nav class="navbar fixed-top navbar-expand-lg navbar-dark bgdark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Forum</a>
+      <a class="navbar-brand text-shadow" href="/" style="font-weight: 500;">Forum</a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,7 @@
         {{block "searchbar" .}}{{end}}
 
         <ul class="navbar-nav">
-          {{ if not .UserInfo.ID }}
+          {{ if not .UserInfo.Logged }}
           <li class="nav-item">
             <a class="nav-link" href="/login">Login</a>
           </li>
@@ -54,7 +54,7 @@
           </li>
           {{ else }}
           <li class="nav-item">
-            <a class="nav-link" href="/user?id={{ .UserInfo.ID }}">
+            <a class="nav-link text-capitalize" href="/user?id={{ .UserInfo.ID }}">
               <i class="fas fa-user"></i> {{ .UserInfo.Username}}
             </a>
 
