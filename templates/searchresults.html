@@ -11,7 +11,9 @@
             {{ range .Results}}
 
             <li class="list-group-item card-bg">
-                <p class="card-text "><a href="/post?id={{.ID}}">{{.Title}}</a>
+                <p class="card-text "><a href="/post?id={{.ID}}"
+                        class="link-light text-decoration-none text-capitalize"> <i class="fas fa-clone"></i>
+                        {{.Title}}</a>
                 </p>
 
 

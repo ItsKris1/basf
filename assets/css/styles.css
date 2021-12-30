@@ -27,6 +27,13 @@ body {
   border: var(--form-border);
 }
 
+textarea#commenttext {
+  background-color: #363d41;
+}
+
+.container {
+  padding-top: 75px;
+}
 /* Icon colors */
 .fa-thumbs-up {
   color: rgb(57, 124, 57);
@@ -42,6 +49,17 @@ a .fa-thumbs-up:hover {
 
 a .fa-thumbs-down:hover {
   color: rgb(216, 0, 0);
+}
+
+.fa-star,
+.fa-clone {
+  color: rgb(219, 205, 205);
+}
+
+.link-light:hover {
+  background-color: #4e5358;
+  padding: 0.25rem;
+  border-radius: 2px;
 }
 /* Icon colors END*/
 
@@ -124,8 +142,14 @@ input:-webkit-autofill {
   font-size: 0.95rem !important;
 }
 
+/* Remove the arrow which toggles dropdown */
 .select2-selection__arrow b {
   display: none !important;
+}
+
+#searchbtn {
+  border: var(--form-border);
+  background-color: rgb(184, 184, 184);
 }
 /* Select 2 with single option END */
 
