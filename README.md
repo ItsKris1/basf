@@ -19,8 +19,17 @@ You need to have GCC(**https://gcc.gnu.org/**) installed to run the application.
 
 Navigate to project root directory **/forum-authentication**<br> Run `go run cmd/forum/main.go`<br> Go to **http://localhost:8000**
 
-## Stack
+## Images
+Home page
 
+![Screenshot 2023-12-10 103147](https://github.com/ItsKris1/forum/assets/69897943/48d0094e-b87b-46fa-b3a0-9928310b5132)
+
+Post view page
+
+
+![Screenshot 2023-12-10 103238](https://github.com/ItsKris1/forum/assets/69897943/29fa26fc-e3e3-4dc2-84e0-64c1d580b42f)
+
+## Stack
 Frontend
 
 - JQuery Select2
