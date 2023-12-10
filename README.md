@@ -19,13 +19,21 @@ You need to have GCC(**https://gcc.gnu.org/**) installed to run the application.
 
 Navigate to project root directory<br> Run `go run cmd/forum/main.go`<br> Go to **http://localhost:8000**
 
-## Images
-Home page
+## Images of the pages
+Login
+
+![image](https://github.com/ItsKris1/forum/assets/69897943/aa47ea59-dd0a-4a6e-ae3a-b897348f407c)
+
+Register
+
+![image](https://github.com/ItsKris1/forum/assets/69897943/959b7ba9-89fd-466f-a474-9af607c08e8a)
+
+
+Home
 
 ![Screenshot 2023-12-10 103147](https://github.com/ItsKris1/forum/assets/69897943/48d0094e-b87b-46fa-b3a0-9928310b5132)
 
-Post view page
-
+Post view
 
 ![Screenshot 2023-12-10 103238](https://github.com/ItsKris1/forum/assets/69897943/29fa26fc-e3e3-4dc2-84e0-64c1d580b42f)
 
