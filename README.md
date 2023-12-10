@@ -17,7 +17,7 @@ You need to have GCC(**https://gcc.gnu.org/**) installed to run the application.
 
 ## Run the project
 
-Navigate to project root directory **/forum-authentication**<br> Run `go run cmd/forum/main.go`<br> Go to **http://localhost:8000**
+Navigate to project root directory<br> Run `go run cmd/forum/main.go`<br> Go to **http://localhost:8000**
 
 ## Images
 Home page
