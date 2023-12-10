@@ -4,11 +4,10 @@ This project was a part of my schools Go course. I developed a forum mostly by m
 
 ### Features
 
-- Register & login (session based)
-- Post - including associating them with tags
-- Comment posts
+- Session based authentication
+- Create and comment posts
+- Associate posts with tags and search them by the tag
 - Like and dislike posts & comments
-- Filter posts by tags
 
 ## Prerequisites
 
