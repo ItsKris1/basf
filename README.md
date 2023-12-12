@@ -1,4 +1,5 @@
 ## Project description
+A forum, where you can create posts and comment on them.
 
 This project was a part of my schools Go course. I developed the Forum mostly by myself and got a little bit of help from my school colleague.
 
