@@ -1,6 +1,6 @@
 ## Project description
 
-This project was a part of my schools Go course. I developed a forum mostly by myself with a little bit of help from my school colleague Tammik Tanar.
+This project was a part of my schools Go course. I developed the Forum mostly by myself and got a little bit of help from my school colleague.
 
 ### Features
 
@@ -49,7 +49,3 @@ Backend
 - Golang
 - SQLite
 
-## Authors
-
-- ItsKris1
-- tammiktanar
